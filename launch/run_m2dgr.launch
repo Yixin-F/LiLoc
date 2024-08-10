@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+    <param name="/use_sim_time" value="true" />
+    
+    <!-- params -->
+    <rosparam file="$(find block_localization)/config/m2dgr_params.yaml" command="load" />
+
+    <!-- nodelet -->
+    <node pkg="block_localization" type="liloc_nodelet" name="liloc_nodelet" output="screen" />
+
+</launch>

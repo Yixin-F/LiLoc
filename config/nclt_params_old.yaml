@@ -1,0 +1,70 @@
+block_localization: 
+    odom_child_frame_id: "velodyne"
+
+    # lidar settings
+    lidarTopic: "/points_raw"
+    have_ring_time_channel: false     # if "XYZI", false; if "XYZIRT", true
+    lidarMinRange: 2.0
+    lidarMaxRange: 90.0
+
+    # imu settings
+    imuTopic: "/imu_raw"
+    imuAccNoise: 0.01
+    imuGyrNoise: 0.01
+    gravity: 9.80416
+    imuFrequency: 100
+
+    # sensors extrinsics T_lb body to lidar
+    extrinsicTrans: [ 0, 0, 0.28 ]
+
+    extrinsicRot: [1, 0, 0,
+                   0, 1, 0,
+                   0, 0, 1]
+    extrinsicRPY: [1, 0, 0,
+                   0, 1, 0,
+                   0, 0, 1]
+
+    # L2gt_t: [0.00679684,  0.01542909, 0.95686191]
+
+    # L2gt_R: [ -0.0122693,  -0.9999205, -0.0028972,
+    #         -0.9998251, 0.0123089, -0.0140843,
+    #          0.0141188, 0.0027239, -0.9998966 ]
+    L2gt_t: [ 0.002, 0.004, 0.957]
+    L2gt_R: [ -0.0122693,  -0.9998251, 0.0141188,
+              -0.9999205, 0.0123089, 0.0027239,
+              -0.0028972,  -0.0140843,  -0.9998966 ]
+
+    # system settings
+    cool_time_duration: 2.00    # during "cool_time", imu inputs are ignored
+    key_interval: 0.1           # select key frames according to time interval
+    mapqry_interval: 1.0        # query time to change BM
+
+    # ndt settings
+    ndt_neighbor_search_method: "DIRECT1"
+    ndt_resolution: 2.0
+    ndt_epsilon: 0.01           # maximum allowable translation squared difference between two consecutive transformations
+    penalty_thres: 0.6          
+    penalty_weight: 1.0
+
+    # gtsam settings
+    odomLinearNoise: 0.08
+    odomAngularNoise: 0.05
+    active_factors: 20
+    preserve_factors: 5
+
+    # initialpose settings
+    # if "specify_init_pose" is true, pose estimator will be initialized with the following params. Otherwise, you need to input an initial pose with "2D Pose Estimate" on rviz"
+    specify_init_pose: true
+    init_pos_x: 0.0
+    init_pos_y: 0.0
+    init_pos_z: 0.0
+    init_ori_w: 1
+    init_ori_x: 0.0
+    init_ori_y: 0.0
+    init_ori_z: 0.0
+
+
+globalmap_server:
+    globalmap_dir: "/home/yixfeng/Block-SLAM/map/nclt/20120122/" # directory address of your BMs; end with "/"
+    downsample_resolution: 0.2
+    

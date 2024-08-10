@@ -1,0 +1,11 @@
+<library path="lib/libblock_localization_nodelet">
+    <class name="block_localization/BlockLocalizationNodelet" type="block_localization::BlockLocalizationNodelet" base_class_type="nodelet::Nodelet" />
+</library>
+
+<library path="lib/libglobalmap_server_nodelet">
+    <class name="block_localization/GlobalmapServerNodelet" type="block_localization::GlobalmapServerNodelet" base_class_type="nodelet::Nodelet" />
+</library>
+
+<library path="lib/libpoints_preprocessing_nodelet">
+    <class name="block_localization/PointsPreprocessingNodelet" type="block_localization::PointsPreprocessingNodelet" base_class_type="nodelet::Nodelet" />
+</library>
