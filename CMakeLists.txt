@@ -142,8 +142,17 @@ include_directories(
 #   tbb
 # )
 
-add_executable(liloc_nodelet src/LiLoc_nodelet.cpp)
-target_link_libraries(liloc_nodelet
+# add_executable(liloc_nodelet src/LiLoc_nodelet.cpp)
+# target_link_libraries(liloc_nodelet
+#   ${catkin_LIBRARIES}
+#   ${PCL_LIBRARIES}
+#   yaml-cpp
+#   gtsam
+#   tbb
+# )
+
+add_executable(main src/main.cpp)
+target_link_libraries(main
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
   yaml-cpp
