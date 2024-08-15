@@ -97,8 +97,6 @@ public:
         processVelodyne(msg, cloud_ptr);
 
         cloud_buff.push_back(std::make_pair(msg->header.stamp.toSec(), cloud_ptr));
-
-        SyncMeasurements();
     }
 
     void processVelodyne(const sensor_msgs::PointCloud2::ConstPtr &msg, pcl::PointCloud<PointType>::Ptr& cloud_out) {
@@ -834,7 +832,7 @@ public:
             return false;
         }
 
-        // std::lock_guard<std::mutex> lock(buff_mutex);
+        std::lock_guard<std::mutex> lock(buff_mutex);
 
         double lidar_end_time = 0.0;
         if (!measurement_pushed) {
@@ -893,11 +891,6 @@ public:
         sensor_measurement.imu_buff_.push_back(imu_buff.front());
 
         measurement_pushed = false;
-
-        std::cout << "start: " << sensor_measurement.lidar_start_time_ << std::endl;
-        std::cout << "end: " << sensor_measurement.lidar_end_time_ << std::endl;
-        std::cout << "diff: " << sensor_measurement.lidar_end_time_ - sensor_measurement.lidar_start_time_ << std::endl;
-        std::cout << "imu: " << sensor_measurement.imu_buff_.size() << std::endl;
 
         return true;
     }
