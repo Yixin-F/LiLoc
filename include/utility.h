@@ -57,6 +57,36 @@
 #include <thread>
 #include <mutex>
 
+// lidar type
+struct VelodynePointXYZIRT {
+    PCL_ADD_POINT4D;
+    PCL_ADD_INTENSITY;
+    int ring;
+    float time;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(VelodynePointXYZIRT,
+        (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)
+        (int, ring, ring)(float, time, time))
+
+struct OusterPointXYZIRT {
+    PCL_ADD_POINT4D;
+    float intensity;
+    float t;
+    float reflectivity;
+    int ring;
+    float noise;
+    float range;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(OusterPointXYZIRT,
+        (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)
+        (float, t, t)(float, reflectivity, reflectivity)
+        (int, ring, ring)(float, noise, noise)(float, range, range))
+
+// pose type
 struct PointXYZIRPYT {
     PCL_ADD_POINT4D
     PCL_ADD_INTENSITY;             
@@ -73,12 +103,54 @@ POINT_CLOUD_REGISTER_POINT_STRUCT (PointXYZIRPYT,
                                    (float, roll, roll) (float, pitch, pitch) (float, yaw, yaw)
                                    (double, time, time))
 
-typedef PointXYZIRPYT  PointTypePose;
+typedef PointXYZIRPYT PointTypePose;
 
-typedef pcl::PointXYZI PointType;
+// point type
+typedef pcl::PointXYZINormal PointType;
 
 enum class SensorType {
     VELODYNE, OUSTER, HORIZON, MID40, MID360, AVIA
+};
+
+enum Feature {
+    Nor, Poss_Plane, Real_Plane, Edge_Jump, Edge_Plane, Wire, ZeroPoint
+};
+
+enum Surround {
+    Prev, Next
+};
+
+enum E_jump {
+    Nr_nor, Nr_zero, Nr_180, Nr_inf, Nr_blind
+};
+
+struct orgtype {
+    double range;
+    double dista; 
+    double angle[2];
+    double intersect;
+    E_jump edj[2];
+    Feature ftype;
+    orgtype() {
+        range = 0;
+        edj[Prev] = Nr_nor;
+        edj[Next] = Nr_nor;
+        ftype = Nor;
+        intersect = 2;
+    }
+};
+
+struct SensorMeasurement {
+    double bag_time_{0.0};
+
+    double lidar_start_time_{0.0};
+    double lidar_end_time_{0.0};
+
+    pcl::PointCloud<PointType>::Ptr cloud_ptr_{};
+    pcl::PointCloud<PointType>::Ptr plane_ptr_{};
+    pcl::PointCloud<PointType>::Ptr edge_ptr_{};
+
+    std::deque<sensor_msgs::Imu> imu_buff_;
 };
 
 class ParamServer {
@@ -95,6 +167,8 @@ public:
     std::string imuTopic;
     std::string imuOdomTopic;
     std::string lidarOdomTopic;
+
+    float timeScale;
 
     // LiDAR settings
     SensorType sensor;
@@ -175,6 +249,8 @@ public:
         nh.param<std::string>("system/imuOdomTopic", imuOdomTopic, " ");
         nh.param<std::string>("system/lidarOdomTopic", lidarOdomTopic, " ");
 
+        nh.param<float>("system/timeScale", timeScale, 1000.0);
+
         std::string sensorStr;
         nh.param<std::string>("factor/sensor", sensorStr, " ");
         if (sensorStr == "velodyne") {
@@ -222,23 +298,23 @@ public:
         q_body_sensor = q_sensor_body.inverse();
         t_body_sensor = -(q_sensor_body.inverse() * t_sensor_body);
 
-        nh.param<float>("blind", blind, 0.5);
-        nh.param<float>("inf_bound", inf_bound, 10);
-        nh.param<int>("group_size", group_size, 8);
-        nh.param<float>("disA", disA, 0.01);
-        nh.param<float>("disB", disB, 0.1);
-        nh.param<float>("p2l_ratio", p2l_ratio, 400);
-        nh.param<float>("limit_maxmid", limit_maxmid, 9);
-        nh.param<float>("limit_midmin", limit_midmin, 16);
-        nh.param<float>("limit_maxmin", limit_maxmin, 3.24);
-        nh.param<float>("jump_up_limit", jump_up_limit, 175.0);
-        nh.param<float>("jump_down_limit", jump_down_limit, 5.0);
-        nh.param<float>("cos160", cos160, 160.0);
-        nh.param<float>("edgea", edgea, 3);
-        nh.param<float>("edgeb", edgeb, 0.05);
-        nh.param<float>("smallp_intersect", smallp_intersect, 170.0);
-        nh.param<float>("smallp_ratio", smallp_ratio, 1.2);
-        nh.param<int>("point_filter_num", point_filter_num, 4);
+        nh.param<float>("feature/blind", blind, 0.5);
+        nh.param<float>("feature/inf_bound", inf_bound, 10);
+        nh.param<int>("feature/group_size", group_size, 8);
+        nh.param<float>("feature/disA", disA, 0.01);
+        nh.param<float>("feature/disB", disB, 0.1);
+        nh.param<float>("feature/p2l_ratio", p2l_ratio, 400);
+        nh.param<float>("feature/limit_maxmid", limit_maxmid, 9);
+        nh.param<float>("feature/limit_midmin", limit_midmin, 16);
+        nh.param<float>("feature/limit_maxmin", limit_maxmin, 3.24);
+        nh.param<float>("feature/jump_up_limit", jump_up_limit, 175.0);
+        nh.param<float>("feature/jump_down_limit", jump_down_limit, 5.0);
+        nh.param<float>("feature/cos160", cos160, 160.0);
+        nh.param<float>("feature/edgea", edgea, 3);
+        nh.param<float>("feature/edgeb", edgeb, 0.05);
+        nh.param<float>("feature/smallp_intersect", smallp_intersect, 170.0);
+        nh.param<float>("feature/smallp_ratio", smallp_ratio, 1.2);
+        nh.param<int>("feature/point_filter_num", point_filter_num, 4);
         jump_up_limit = cos(jump_up_limit / 180 * M_PI);
         jump_down_limit = cos(jump_down_limit / 180 * M_PI);
         cos160 = cos(cos160 / 180 * M_PI);
@@ -335,12 +411,30 @@ void imuRPY2rosRPY(sensor_msgs::Imu *thisImuMsg, T *rosRoll, T *rosPitch, T *ros
     *rosYaw = imuYaw;
 }
 
-float pointDistance(PointType p) {
+template <typename T>
+float pointDistance(const T& p) {
     return sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
 }
 
-float pointDistance(PointType p1, PointType p2) {
+template <typename T>
+float pointDistance(const T& p1, const T& p2) {
     return sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) + (p1.z - p2.z) * (p1.z - p2.z));
+}
+
+template <typename T>
+inline bool HasInf(const T& p) {
+  return (std::isinf(p.x) || std::isinf(p.y) || std::isinf(p.z));
+}
+
+template <typename T>
+inline bool HasNan(const T& p) {
+  return (std::isnan(p.x) || std::isnan(p.y) || std::isnan(p.z));
+}
+
+template <typename T>
+inline bool IsNear(const T& p1, const T& p2) {
+  return ((abs(p1.x - p2.x) < 1e-7) || (abs(p1.y - p2.y) < 1e-7) ||
+          (abs(p1.z - p2.z) < 1e-7));
 }
 
 #endif
