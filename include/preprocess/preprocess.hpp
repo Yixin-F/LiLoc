@@ -55,6 +55,9 @@ public:
     void imuHandler(const sensor_msgs::Imu::ConstPtr &msg) {
         std::lock_guard<std::mutex> lock(buff_mutex);
 
+        // sensor_msgs::Imu msg_aligned = imuConverter(*msg);
+        // msg = std::move(&msg_aligned);
+
         static double last_imu_timestamp = 0.0;
         static sensor_msgs::Imu last_imu = *msg;
 
@@ -826,8 +829,6 @@ public:
         static int lidar_scan_num = 0;
         static SensorMeasurement local_sensor_measurement;
 
-        std::cout << "get " << std::endl;
-
         if (cloud_buff.empty() || imu_buff.empty()) {
             return false;
         }
@@ -839,30 +840,30 @@ public:
             if (!process_lidar) {
                 local_sensor_measurement.cloud_ptr_ = cloud_buff.front().second;
                 local_sensor_measurement.bag_time_ = cloud_buff.front().first;
-                    if (!local_sensor_measurement.cloud_ptr_->points.empty()) {
-                        local_sensor_measurement.lidar_start_time_ = cloud_buff.front().first + local_sensor_measurement.cloud_ptr_->points.front().curvature / (double)(1000);
-                    } 
-                    else {
-                        local_sensor_measurement.lidar_start_time_ = cloud_buff.front().first;
-                    }
+                if (!local_sensor_measurement.cloud_ptr_->points.empty()) {
+                    local_sensor_measurement.lidar_start_time_ = cloud_buff.front().first + local_sensor_measurement.cloud_ptr_->points.front().curvature / (double)(1000);
+                } 
+                else {
+                    local_sensor_measurement.lidar_start_time_ = cloud_buff.front().first;
+                }
 
-                    if (local_sensor_measurement.cloud_ptr_->size() <= 1) {
-                        ROS_WARN_STREAM("Too Few Points in Cloud !");
-                        lidar_end_time = local_sensor_measurement.lidar_start_time_ + lidar_mean_scantime;
-                    } 
-                    else if (local_sensor_measurement.cloud_ptr_->points.back().curvature / (double)(1000) < 0.5 * lidar_mean_scantime) {
-                        lidar_end_time = local_sensor_measurement.lidar_start_time_ + lidar_mean_scantime;
-                    } 
-                    else {
-                        lidar_scan_num++;
-                        lidar_end_time = local_sensor_measurement.bag_time_ + local_sensor_measurement.cloud_ptr_->points.back().curvature / (double)(1000);
-                        lidar_mean_scantime += ((local_sensor_measurement.cloud_ptr_->points.back().curvature - local_sensor_measurement.cloud_ptr_->points.front().curvature) 
-                                               / (double)(1000) - lidar_mean_scantime) / (double)(lidar_scan_num);
-                    }
+                if (local_sensor_measurement.cloud_ptr_->size() <= 1) {
+                    ROS_WARN_STREAM("Too Few Points in Cloud !");
+                    lidar_end_time = local_sensor_measurement.lidar_start_time_ + lidar_mean_scantime;
+                } 
+                else if (local_sensor_measurement.cloud_ptr_->points.back().curvature / (double)(1000) < 0.5 * lidar_mean_scantime) {
+                    lidar_end_time = local_sensor_measurement.lidar_start_time_ + lidar_mean_scantime;
+                } 
+                else {
+                    lidar_scan_num++;
+                    lidar_end_time = local_sensor_measurement.bag_time_ + local_sensor_measurement.cloud_ptr_->points.back().curvature / (double)(1000);
+                    lidar_mean_scantime += ((local_sensor_measurement.cloud_ptr_->points.back().curvature - local_sensor_measurement.cloud_ptr_->points.front().curvature) 
+                                            / (double)(1000) - lidar_mean_scantime) / (double)(lidar_scan_num);
+                }
 
-                    local_sensor_measurement.lidar_end_time_ = lidar_end_time;
+                local_sensor_measurement.lidar_end_time_ = lidar_end_time;
                     
-                    process_lidar = true;
+                process_lidar = true;
             }
 
             measurement_pushed = true;
@@ -892,9 +893,43 @@ public:
 
         measurement_pushed = false;
 
+        undistortPointCloud();
+
         return true;
     }
 
+    void resetMeasurement() {
+        SensorMeasurement new_sensor_measurement;
+        sensor_measurement = new_sensor_measurement;
+    }
+
+    bool undistortPointCloud() {
+        if (sensor_measurement.cloud_ptr_->size() < 1) {
+            return false;
+        }
+
+        // TODO: undistort ??
+
+        // TODO: get feature
+        sensor_measurement.plane_ptr_.reset(new pcl::PointCloud<PointType>());
+        sensor_measurement.edge_ptr_.reset(new pcl::PointCloud<PointType>());
+
+        switch(sensor) {
+            case SensorType::VELODYNE:
+                getVelodyneFeature(std::make_pair(sensor_measurement.bag_time_, sensor_measurement.cloud_ptr_), sensor_measurement.plane_ptr_, sensor_measurement.edge_ptr_);
+                break;
+            
+            case SensorType::OUSTER:
+                getOusterFeature(std::make_pair(sensor_measurement.bag_time_, sensor_measurement.cloud_ptr_), sensor_measurement.plane_ptr_, sensor_measurement.edge_ptr_);
+                break;
+
+            default:
+                getLivoxFeature(std::make_pair(sensor_measurement.bag_time_, sensor_measurement.cloud_ptr_), sensor_measurement.plane_ptr_, sensor_measurement.edge_ptr_);
+                break;
+        }
+        
+        return true;
+    }
 
 };
 

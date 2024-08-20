@@ -1,13 +1,16 @@
 system:
   robot_id: 0
-  root_suffix: " "
-  numberOfCores: 8
+  root_suffix: " ../"
+  numberOfCores: 4
+  mode: "lio"  # "lio", "relo"
 
   # topic
   pointCloudTopic: "velodyne_points"
-  imuTopic: "imu/data"
+  imuTopic: "handsfree/imu"
   imuOdomTopic: "odometry/imu"
   lidarOdomTopic: "odometry/lidar"
+
+  timeScale: 1000  # nclt: 0.001, other: 1000.0
 
 factor:
   # lidar
@@ -28,10 +31,10 @@ factor:
   imuRPYWeight: 0.01
 
   # extrinsics, lidar to imu
-  extrinsicTrans: [ 0.0, 0.0, 0.0 ]
-  extrinsicRot: [ 1, 0, 0,
-                  0, 1, 0,
-                  0, 0, 1 ]
+  extrinsicTrans: [ 0.071, -0.053, 0.097 ]
+  extrinsicRot: [ 0.9935, -0.0140, -0.1128,
+                 0.0137, 0.9999, -0.0040,
+                 0.1128, 0.0024, 0.9936]
   extrinsicRPY: [ 1, 0, 0,
                   0, 1, 0,
                   0, 0, 1 ]
@@ -53,13 +56,13 @@ feature:
   edgeb: 0.1               # velodyne/ouster: 0.1, livox: 0.05
   smallp_intersect: 172.5
   smallp_ratio: 1.2
-  point_filter_num: 2      # velodyne/ouster: 2, livox: 3
+  point_filter_num: 1      # velodyne: 1, 2, 4; ouster: 4; livox: 2
 
 mapping:
   # filter
-  mappingCornerLeafSize: 0.2
+  mappingCornerLeafSize: 0.1
   mappingSurfLeafSize: 0.2
-  globalMapLeafSize: 0.4
+  globalMapLeafSize: 0.2
 
   # keyframe
   surroundingkeyframeAddingDistThreshold: 0.5

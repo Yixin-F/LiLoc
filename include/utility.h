@@ -57,6 +57,20 @@
 #include <thread>
 #include <mutex>
 
+#include <experimental/filesystem> // file gcc>=8
+#include <experimental/optional>
+
+#include "ikd-Tree/ikd_Tree.h"
+#include "math_tools.h"
+
+namespace fs = std::experimental::filesystem;
+
+#define NUM_MATCH_POINTS 5
+#define MATCH_DIS 2
+#define PLANE_TH 0.1
+#define LINE_TH 3.0
+#define LM_ITERATION 20
+
 // lidar type
 struct VelodynePointXYZIRT {
     PCL_ADD_POINT4D;
@@ -112,6 +126,10 @@ enum class SensorType {
     VELODYNE, OUSTER, HORIZON, MID40, MID360, AVIA
 };
 
+enum class ModeType {
+    LIO, RELO
+};
+
 enum Feature {
     Nor, Poss_Plane, Real_Plane, Edge_Jump, Edge_Plane, Wire, ZeroPoint
 };
@@ -140,6 +158,7 @@ struct orgtype {
     }
 };
 
+// measurement
 struct SensorMeasurement {
     double bag_time_{0.0};
 
@@ -153,6 +172,54 @@ struct SensorMeasurement {
     std::deque<sensor_msgs::Imu> imu_buff_;
 };
 
+// edge
+struct Edge {
+    int from_idx;
+    int to_idx;
+    gtsam::Pose3 relative;
+};
+
+// node
+struct Node {
+    int idx;
+    gtsam::Pose3 initial;
+};
+
+// pose
+struct pose
+{
+    Eigen::Vector3d t;
+    Eigen::Matrix3d R;
+};
+
+// g2o format
+struct G2oLineInfo {
+    std::string type;
+
+    int prev_idx = -1; // for vertex, this member is null
+    int curr_idx;
+
+    std::vector<double> trans;
+    std::vector<double> quat;
+
+    inline static const std::string kVertexTypeName = "VERTEX_SE3:QUAT";
+    inline static const std::string kEdgeTypeName = "EDGE_SE3:QUAT";
+}; 
+
+using SessionNodes = std::multimap<int, Node>; // from_idx, Node
+using SessionEdges = std::multimap<int, Edge>; // from_idx, Edge
+
+struct State {
+public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    Eigen::Matrix4d pose = Eigen::Matrix4d::Identity();
+    Eigen::Vector3d vel = Eigen::Vector3d::Zero();
+    Eigen::Vector3d ba = Eigen::Vector3d::Zero();
+    Eigen::Vector3d bg = Eigen::Vector3d::Zero();
+};
+
+State ext_state;
+
 class ParamServer {
 public:
 
@@ -161,6 +228,8 @@ public:
     int robot_id;  // online multi-session exploration
     std::string root_suffix;  // lifelong localization with prior knowledge
     int numberOfCores;
+
+    ModeType mode;
 
     // topic names
     std::string pointCloudTopic;
@@ -195,16 +264,11 @@ public:
     std::vector<double> imuGravity_NV;
 
     std::vector<double> extRotV;
-    std::vector<double> extRPYV;
     std::vector<double> extTransV;
     Eigen::Matrix3d extRot;
-    Eigen::Matrix3d extRPY;
     Eigen::Vector3d extTrans;
-    Eigen::Quaterniond extQRPY;
-    Eigen::Quaterniond q_sensor_body;
-    Eigen::Vector3d t_sensor_body;
-    Eigen::Quaterniond q_body_sensor;
-    Eigen::Vector3d t_body_sensor;
+    Eigen::Matrix3d extRot_inv;
+    Eigen::Vector3d extTrans_inv;
 
     // feature
     float blind;
@@ -243,6 +307,14 @@ public:
         nh.param<std::string>("system/root_suffix", root_suffix, " ");
         // ROS_INFO_STREAM("ROOT SUFFIX: " << root_suffix);
         nh.param<int>("system/numberOfCores", numberOfCores, 8);
+
+        std::string modeStr;
+        nh.param<std::string>("system/mode", modeStr, "lio");
+        if (modeStr == "lio") {
+            mode = ModeType::LIO;
+        } else if (modeStr == "relo") {
+            mode = ModeType::RELO;
+        }
 
         nh.param<std::string>("system/pointCloudTopic", pointCloudTopic, " ");
         nh.param<std::string>("system/imuTopic", imuTopic, " ");
@@ -286,17 +358,15 @@ public:
         nh.param<float>("factor/imuRPYWeight", imuRPYWeight, 0.01);
 
         nh.param<std::vector<double>>("factor/extrinsicRot", extRotV, std::vector<double>());
-        nh.param<std::vector<double>>("factor/extrinsicRPY", extRPYV, std::vector<double>());
         nh.param<std::vector<double>>("factor/extrinsicTrans", extTransV, std::vector<double>());
         extRot = Eigen::Map<const Eigen::Matrix<double, -1, -1, Eigen::RowMajor>>(extRotV.data(), 3, 3);
-        extRPY = Eigen::Map<const Eigen::Matrix<double, -1, -1, Eigen::RowMajor>>(extRPYV.data(), 3, 3);
         extTrans = Eigen::Map<const Eigen::Matrix<double, -1, -1, Eigen::RowMajor>>(extTransV.data(), 3, 1);
-        extQRPY = Eigen::Quaterniond(extRPY);
+        extRot_inv = extRot.inverse();
+        extTrans_inv = - extRot.inverse() * extTrans;
 
-        q_sensor_body = Eigen::Quaterniond(extRPY);
-        t_sensor_body = extTrans;
-        q_body_sensor = q_sensor_body.inverse();
-        t_body_sensor = -(q_sensor_body.inverse() * t_sensor_body);
+        ext_state.pose.setIdentity();
+        ext_state.pose.block(0, 0, 3, 3) = extRot;
+        ext_state.pose.block(0, 3, 3, 1) = extTrans;
 
         nh.param<float>("feature/blind", blind, 0.5);
         nh.param<float>("feature/inf_bound", inf_bound, 10);
@@ -337,33 +407,17 @@ public:
 
         // rotate acceleration
         Eigen::Vector3d acc(imu_in.linear_acceleration.x, imu_in.linear_acceleration.y, imu_in.linear_acceleration.z);
-        acc = extRot * acc;
+        acc = extRot_inv * acc;
         imu_out.linear_acceleration.x = acc.x();
         imu_out.linear_acceleration.y = acc.y();
         imu_out.linear_acceleration.z = acc.z();
 
         // rotate gyroscope
         Eigen::Vector3d gyr(imu_in.angular_velocity.x, imu_in.angular_velocity.y, imu_in.angular_velocity.z);
-        gyr = extRot * gyr;
+        gyr = extRot_inv * gyr;
         imu_out.angular_velocity.x = gyr.x();
         imu_out.angular_velocity.y = gyr.y();
         imu_out.angular_velocity.z = gyr.z();
-
-        // rotate roll pitch yaw
-        Eigen::Quaterniond q_from(imu_in.orientation.w, imu_in.orientation.x, imu_in.orientation.y,
-                                  imu_in.orientation.z);
-        Eigen::Quaterniond q_final = extQRPY;
-
-        q_final.normalize();
-        imu_out.orientation.x = q_final.x();
-        imu_out.orientation.y = q_final.y();
-        imu_out.orientation.z = q_final.z();
-        imu_out.orientation.w = q_final.w();
-
-        if (sqrt(q_final.x() * q_final.x() + q_final.y() * q_final.y() + q_final.z() * q_final.z() + q_final.w() * q_final.w()) < 0.1) {
-            ROS_ERROR("Invalid quaternion, please use a 9-axis IMU!");
-            ros::shutdown();
-        }
 
         return imu_out;
     }
@@ -435,6 +489,235 @@ template <typename T>
 inline bool IsNear(const T& p1, const T& p2) {
   return ((abs(p1.x - p2.x) < 1e-7) || (abs(p1.y - p2.y) < 1e-7) ||
           (abs(p1.z - p2.z) < 1e-7));
+}
+
+bool isTwoStringSame(std::string _str1, std::string _str2) {
+	return !(_str1.compare(_str2));
+}
+
+// read g2o, example：VERTEX_SE3:QUAT 99 -61.332581 -9.253125 0.131973 -0.004256 -0.005810 -0.625732 0.780005
+G2oLineInfo splitG2oFileLine(std::string _str_line) {
+    std::stringstream ss(_str_line);
+
+	std::vector<std::string> parsed_elms ;
+    std::string elm;
+	char delimiter = ' ';
+    while (getline(ss, elm, delimiter)) {
+        parsed_elms.push_back(elm); // convert string to "double"
+    }
+
+	G2oLineInfo parsed;
+
+	if( isTwoStringSame(parsed_elms.at(0), G2oLineInfo::kVertexTypeName) )
+	{
+		parsed.type = parsed_elms.at(0);
+		parsed.curr_idx = std::stoi(parsed_elms.at(1));
+		parsed.trans.push_back(std::stod(parsed_elms.at(2)));
+		parsed.trans.push_back(std::stod(parsed_elms.at(3)));
+		parsed.trans.push_back(std::stod(parsed_elms.at(4)));
+		parsed.quat.push_back(std::stod(parsed_elms.at(5)));
+		parsed.quat.push_back(std::stod(parsed_elms.at(6)));
+		parsed.quat.push_back(std::stod(parsed_elms.at(7)));
+		parsed.quat.push_back(std::stod(parsed_elms.at(8)));
+	}
+	if( isTwoStringSame(parsed_elms.at(0), G2oLineInfo::kEdgeTypeName) )
+	{
+		parsed.type = parsed_elms.at(0);
+		parsed.prev_idx = std::stoi(parsed_elms.at(1));
+		parsed.curr_idx = std::stoi(parsed_elms.at(2));
+		parsed.trans.push_back(std::stod(parsed_elms.at(3)));
+		parsed.trans.push_back(std::stod(parsed_elms.at(4)));
+		parsed.trans.push_back(std::stod(parsed_elms.at(5)));
+		parsed.quat.push_back(std::stod(parsed_elms.at(6)));
+		parsed.quat.push_back(std::stod(parsed_elms.at(7)));
+		parsed.quat.push_back(std::stod(parsed_elms.at(8)));
+		parsed.quat.push_back(std::stod(parsed_elms.at(9)));
+	}
+
+	return parsed;
+}
+
+// filesort by name
+bool fileNameSort(std::string name1_, std::string name2_){
+    std::string::size_type iPos1 = name1_.find_last_of('/') + 1;
+	std::string filename1 = name1_.substr(iPos1, name1_.length() - iPos1);
+	std::string name1 = filename1.substr(0, filename1.rfind("."));
+
+    std::string::size_type iPos2 = name2_.find_last_of('/') + 1;
+    std::string filename2 = name2_.substr(iPos2, name2_.length() - iPos2);
+	std::string name2 = filename2.substr(0, filename2.rfind(".")); 
+
+    return std::stoi(name1) < std::stoi(name2);
+}
+
+template <typename C, typename D, typename Getter>
+void ComputeMeanAndCovDiag(const C& data,
+                           D& mean,
+                           D& cov_diag,
+                           Getter&& getter) {
+  size_t len = data.size();
+  assert(len > 1);
+  // clang-format off
+    mean = std::accumulate(data.begin(), data.end(), D::Zero().eval(),
+                           [&getter](const D& sum, const auto& data) -> D { return sum + getter(data); }) / len;
+    cov_diag = std::accumulate(data.begin(), data.end(), D::Zero().eval(),
+                               [&mean, &getter](const D& sum, const auto& data) -> D {
+                                   return sum + (getter(data) - mean).cwiseAbs2().eval();
+                               }) / (len - 1);
+  // clang-format on
+}
+
+template<typename T>
+bool esti_plane(Eigen::Matrix<T, 4, 1> &pca_result, const KD_TREE<PointType>::PointVector &point, const T &threshold) {  // plane
+    Eigen::Matrix<T, NUM_MATCH_POINTS, 3> A;
+    Eigen::Matrix<T, NUM_MATCH_POINTS, 1> b;
+    A.setZero();
+    b.setOnes();
+    b *= -1.0f;
+
+    for (int j = 0; j < NUM_MATCH_POINTS; j++){
+        A(j, 0) = point[j].x;
+        A(j, 1) = point[j].y;
+        A(j, 2) = point[j].z;
+    }
+
+    Eigen::Matrix<T, 3, 1> normvec = A.colPivHouseholderQr().solve(b);
+
+    T n = normvec.norm();
+    pca_result(0) = normvec(0) / n;
+    pca_result(1) = normvec(1) / n;
+    pca_result(2) = normvec(2) / n;
+    pca_result(3) = 1.0 / n;
+
+    for (int j = 0; j < NUM_MATCH_POINTS; j++)
+    {
+        if (fabs(pca_result(0) * point[j].x + pca_result(1) * point[j].y + pca_result(2) * point[j].z + pca_result(3)) > threshold)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template<typename T>
+bool esti_line(Eigen::Matrix<T, 4, 1> &pca_result, const KD_TREE<PointType>::PointVector &point, const T &threshold, const PointType& pointWorld) {
+    Eigen::Matrix<float, 3, 3> matA1;
+    Eigen::Matrix<float, 1, 3> matD1;
+    Eigen::Matrix<float, 3, 3> matV1;
+
+    float cx = 0, cy = 0, cz = 0;
+    for (const auto& pt : point) {
+        cx += pt.x;
+        cy += pt.y;
+        cz += pt.z;
+    }
+    cx /= NUM_MATCH_POINTS;
+    cy /= NUM_MATCH_POINTS;
+    cz /= NUM_MATCH_POINTS;
+
+    float a11 = 0, a12 = 0, a13 = 0, a22 = 0, a23 = 0, a33 = 0;
+    for (const auto& pt : point) {
+        float ax = pt.x - cx;
+        float ay = pt.y - cy;
+        float az = pt.z - cz;
+
+        a11 += ax * ax; a12 += ax * ay; a13 += ax * az;
+        a22 += ay * ay; a23 += ay * az;
+        a33 += az * az;
+    }
+    a11 /= NUM_MATCH_POINTS; 
+    a12 /= NUM_MATCH_POINTS; 
+    a13 /= NUM_MATCH_POINTS; 
+    a22 /= NUM_MATCH_POINTS; 
+    a23 /= NUM_MATCH_POINTS; 
+    a33 /= NUM_MATCH_POINTS;
+
+    matA1(0, 0) = a11; matA1(0, 1) = a12; matA1(0, 2) = a13;
+    matA1(1, 0) = a12; matA1(1, 2) = a22; matA1(1, 3) = a23;
+    matA1(2, 0) = a13; matA1(2, 1) = a23; matA1(2, 2) = a33;
+
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3f> eigensolver(matA1);
+
+    if (eigensolver.info() != Eigen::Success) 
+        return false;
+            
+    matD1 = eigensolver.eigenvalues();
+    matV1 = eigensolver.eigenvectors();
+
+    if (matD1(0) < matD1(1) * threshold) {
+        return false;
+    }
+
+    float x0 = pointWorld.x;
+    float y0 = pointWorld.y;
+    float z0 = pointWorld.z;
+    float x1 = cx + 0.1 * matV1(0, 0);
+    float y1 = cy + 0.1 * matV1(0, 1);
+    float z1 = cz + 0.1 * matV1(0, 2);
+    float x2 = cx - 0.1 * matV1(0, 0);
+    float y2 = cy - 0.1 * matV1(0, 1);
+    float z2 = cz - 0.1 * matV1(0, 2);
+
+    float a012 = sqrt(((x0 - x1)*(y0 - y2) - (x0 - x2)*(y0 - y1)) * ((x0 - x1)*(y0 - y2) - (x0 - x2)*(y0 - y1))
+                 + ((x0 - x1)*(z0 - z2) - (x0 - x2)*(z0 - z1)) * ((x0 - x1)*(z0 - z2) - (x0 - x2)*(z0 - z1))
+                 + ((y0 - y1)*(z0 - z2) - (y0 - y2)*(z0 - z1)) * ((y0 - y1)*(z0 - z2) - (y0 - y2)*(z0 - z1)));
+
+    float l12 = sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2) + (z1 - z2)*(z1 - z2));
+
+    float la = ((y1 - y2)*((x0 - x1)*(y0 - y2) - (x0 - x2)*(y0 - y1))
+               + (z1 - z2)*((x0 - x1)*(z0 - z2) - (x0 - x2)*(z0 - z1))) / a012 / l12;
+
+    float lb = -((x1 - x2)*((x0 - x1)*(y0 - y2) - (x0 - x2)*(y0 - y1))
+               - (z1 - z2)*((y0 - y1)*(z0 - z2) - (y0 - y2)*(z0 - z1))) / a012 / l12;
+
+    float lc = -((x1 - x2)*((x0 - x1)*(z0 - z2) - (x0 - x2)*(z0 - z1))
+               + (y1 - y2)*((y0 - y1)*(z0 - z2) - (y0 - y2)*(z0 - z1))) / a012 / l12;
+
+    float ld2 = a012 / l12;
+
+    pca_result(0) = la; pca_result(1) = lb; pca_result(2) = lc; pca_result(3) = ld2; 
+
+    return true;
+}
+
+template<typename T>
+void pointAssociateToMap(T const * const pi, T * const po, const State& state) {
+    Eigen::Matrix4d pose_world = state.pose;
+    po->x = pose_world(0 ,0) * pi->x + pose_world(0, 1) * pi->y + pose_world(0, 2) * pi->z + pose_world(0, 3);
+    po->y = pose_world(1, 0) * pi->x + pose_world(1, 1) * pi->y + pose_world(1, 2) * pi->z + pose_world(1, 3);
+    po->z = pose_world(2, 0) * pi->x + pose_world(2, 1) * pi->y + pose_world(2, 2) * pi->z + pose_world(2, 3);
+    po->intensity = pi->intensity;
+}
+
+template<typename T>
+void state2RPYXYZ(T *rpyxyz, const State& state) {
+    Eigen::Matrix4d pose = state.pose;
+
+    Eigen::Matrix3d rot = pose.block(0, 0, 3, 3);
+    Eigen::Matrix<double, 3, 1> rpy = RotMtoEuler(rot);
+    rpyxyz[0] = T(rpy(0));
+    rpyxyz[1] = T(rpy(1));
+    rpyxyz[2] = T(rpy(2));
+
+    Eigen::Vector3d trans = pose.block(0, 3, 3, 1);
+    rpyxyz[3] = T(trans(0));
+    rpyxyz[4] = T(trans(1));
+    rpyxyz[5] = T(trans(2));
+}
+
+template<typename T>
+void RPYXYZ2State(T *rpyxyz, State& state) {
+    Eigen::Matrix3d rot = Exp(double(rpyxyz[0]), double(rpyxyz[1]), double(rpyxyz[2]));
+    Eigen::Matrix<double, 3, 1> xyz((rpyxyz[3]), (rpyxyz[4]), (rpyxyz[5]));
+
+    state.pose.block(0, 0, 3, 3) = rot;
+    state.pose.block(0, 3, 3, 1) = xyz;
+}
+
+void tree2Cloud(KD_TREE<PointType> *tree, pcl::PointCloud<PointType>::Ptr& cloud) {
+    KD_TREE<PointType>::PointVector().swap(tree->PCL_Storage);  
+    tree->flatten(tree->Root_Node, tree->PCL_Storage, NOT_RECORD);
+    cloud->points = tree->PCL_Storage;
 }
 
 #endif

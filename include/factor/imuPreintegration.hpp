@@ -71,7 +71,8 @@ public:
 
     IMUPreintegration() {
         subImu = nh.subscribe<sensor_msgs::Imu>(imuTopic, 2000, &IMUPreintegration::imuHandler, this, ros::TransportHints().tcpNoDelay());
-        subLidarOdometry = nh.subscribe<nav_msgs::Odometry>(lidarOdomTopic, 5, &IMUPreintegration::odometryHandler, this, ros::TransportHints().tcpNoDelay());
+        subLidarOdometry = nh.subscribe<nav_msgs::Odometry>(lidarOdomTopic, 5, &IMUPreintegration::lidarOdometryHandler, this, ros::TransportHints().tcpNoDelay());
+
         pubImuOdometry = nh.advertise<nav_msgs::Odometry>(imuOdomTopic, 2000);
 
         boost::shared_ptr<gtsam::PreintegrationParams> p = gtsam::PreintegrationParams::MakeSharedU(imuGravity);
@@ -137,7 +138,7 @@ public:
         pubImuOdometry.publish(odometry);
     }
 
-    void odometryHandler(const nav_msgs::Odometry::ConstPtr &odomMsg) {
+    void lidarOdometryHandler(const nav_msgs::Odometry::ConstPtr &odomMsg) {
         std::lock_guard<std::mutex> lock(mtx);
 
         double currentCorrectionTime = ROS_TIME(odomMsg);
@@ -334,4 +335,4 @@ public:
 };
 
 
-#endif _IMU_PREINTEGRATION_HPP_
+#endif

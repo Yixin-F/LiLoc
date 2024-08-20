@@ -27,9 +27,6 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   # pcl libraries
   pcl_ros
-  # external libraries
-  ndt_omp
-  hdl_global_localization
   # msgs
   std_msgs
   sensor_msgs
@@ -66,13 +63,6 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-pkg_check_modules(NEW_YAMLCPP yaml-cpp>=0.5)
-if(NEW_YAMLCPP_FOUND)
-  add_definitions(-DHAVE_NEW_YAMLCPP)
-endif(NEW_YAMLCPP_FOUND)
-pkg_check_modules(YAML REQUIRED yaml-cpp)
-message(STATUS "YAML=${YAML_INCLUDE_DIRS} ${YAML_LIBRARIES}")
-
 message(STATUS "PCL_INCLUDE_DIRS:" ${PCL_INCLUDE_DIRS})
 message(STATUS "PCL_LIBRARY_DIRS:" ${PCL_LIBRARY_DIRS})
 message(STATUS "PCL_DEFINITIONS:" ${PCL_DEFINITIONS})
@@ -89,8 +79,6 @@ endif()
 catkin_package(
   INCLUDE_DIRS include
   DEPENDS PCL GTSAM
-  DEPENDS YAML
-
   CATKIN_DEPENDS
   roscpp
   rospy
@@ -151,11 +139,14 @@ include_directories(
 #   tbb
 # )
 
+add_library(ikd_Tree include/ikd-Tree/ikd_Tree.cpp)
+
 add_executable(main src/main.cpp)
 target_link_libraries(main
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
-  yaml-cpp
   gtsam
   tbb
+  ikd_Tree
+  stdc++fs
 )

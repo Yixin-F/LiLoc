@@ -9,8 +9,9 @@ export ROSLISP_PACKAGE_DIRECTORIES='/home/yixin/icra_ws/src/Block-Map-Based-Loca
 
 # modified environment variables
 export CMAKE_PREFIX_PATH="/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/devel:$CMAKE_PREFIX_PATH"
-export LD_LIBRARY_PATH='/opt/ros/noetic/lib:/usr/local/lib'
+export LD_LIBRARY_PATH='/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/devel/lib:/opt/ros/noetic/lib:/usr/local/lib'
 export PATH='/opt/ros/noetic/bin:/home/yixin/.local/bin:/home/yixin/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'
-export PKG_CONFIG_PATH='/opt/ros/noetic/lib/pkgconfig:/usr/local/lib/pkgconfig'
+export PKG_CONFIG_PATH='/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/devel/lib/pkgconfig:/opt/ros/noetic/lib/pkgconfig:/usr/local/lib/pkgconfig'
 export PWD='/home/yixin/icra_ws/src/Block-Map-Based-Localization/build'
+export PYTHONPATH="/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/devel/lib/python3/dist-packages:$PYTHONPATH"
 export ROS_PACKAGE_PATH="/home/yixin/icra_ws/src/Block-Map-Based-Localization:$ROS_PACKAGE_PATH"

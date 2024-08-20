@@ -1,0 +1,32 @@
+[
+{
+  "directory": "/home/yixin/icra_ws/src/Block-Map-Based-Localization/build",
+  "command": "/usr/bin/c++  -DDISABLE_LIBUSB_1_0 -DDISABLE_PCAP -DDISABLE_PNG -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"block_localization\\\" -Dqh_QHpointer -DvtkRenderingContext2D_AUTOINIT=\"1(vtkRenderingContextOpenGL2)\" -DvtkRenderingCore_AUTOINIT=\"3(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingOpenGL2)\" -I/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/devel/include -I/home/yixin/icra_ws/src/Block-Map-Based-Localization/include -I/opt/ros/noetic/include -I/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -isystem /usr/include/vtk-7.1 -isystem /usr/include/freetype2 -isystem /usr/include/pcl-1.10 -isystem /usr/include/eigen3 -isystem /usr/include/ni -isystem /usr/include/openni2 -isystem /usr/local/include/gtsam/3rdparty/SuiteSparse_config -isystem /usr/local/include/gtsam/3rdparty/CCOLAMD -isystem /usr/local/include/gtsam/3rdparty/metis  -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2  -fopenmp -O3 -DNDEBUG   -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -pthread -o CMakeFiles/main.dir/src/main.cpp.o -c /home/yixin/icra_ws/src/Block-Map-Based-Localization/src/main.cpp",
+  "file": "/home/yixin/icra_ws/src/Block-Map-Based-Localization/src/main.cpp"
+},
+{
+  "directory": "/home/yixin/icra_ws/src/Block-Map-Based-Localization/build",
+  "command": "/usr/bin/c++  -DDISABLE_LIBUSB_1_0 -DDISABLE_PCAP -DDISABLE_PNG -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"block_localization\\\" -Dikd_Tree_EXPORTS -Dqh_QHpointer -DvtkRenderingContext2D_AUTOINIT=\"1(vtkRenderingContextOpenGL2)\" -DvtkRenderingCore_AUTOINIT=\"3(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingOpenGL2)\" -I/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/devel/include -I/usr/include/vtk-7.1 -I/usr/include/freetype2 -I/usr/include/pcl-1.10 -I/usr/include/eigen3 -I/usr/include/ni -I/usr/include/openni2 -I/home/yixin/icra_ws/src/Block-Map-Based-Localization/include -I/opt/ros/noetic/include -I/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp  -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2  -fopenmp -O3 -DNDEBUG -fPIC   -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -o CMakeFiles/ikd_Tree.dir/include/ikd-Tree/ikd_Tree.cpp.o -c /home/yixin/icra_ws/src/Block-Map-Based-Localization/include/ikd-Tree/ikd_Tree.cpp",
+  "file": "/home/yixin/icra_ws/src/Block-Map-Based-Localization/include/ikd-Tree/ikd_Tree.cpp"
+},
+{
+  "directory": "/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/gtest/googlemock",
+  "command": "/usr/bin/c++  -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgmock_main_EXPORTS -isystem /usr/src/googletest/googlemock/include -isystem /usr/src/googletest/googlemock -isystem /usr/src/googletest/googletest/include -isystem /usr/src/googletest/googletest  -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O3 -DNDEBUG -fPIC   -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -Wall -Wshadow -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -pthread -DGTEST_HAS_PTHREAD=1 -std=c++11 -o CMakeFiles/gmock_main.dir/src/gmock_main.cc.o -c /usr/src/googletest/googlemock/src/gmock_main.cc",
+  "file": "/usr/src/googletest/googlemock/src/gmock_main.cc"
+},
+{
+  "directory": "/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/gtest/googlemock",
+  "command": "/usr/bin/c++  -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgmock_EXPORTS -I/usr/src/googletest/googlemock/include -I/usr/src/googletest/googlemock -isystem /usr/src/googletest/googletest/include -isystem /usr/src/googletest/googletest  -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O3 -DNDEBUG -fPIC   -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -Wall -Wshadow -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -pthread -DGTEST_HAS_PTHREAD=1 -std=c++11 -o CMakeFiles/gmock.dir/src/gmock-all.cc.o -c /usr/src/googletest/googlemock/src/gmock-all.cc",
+  "file": "/usr/src/googletest/googlemock/src/gmock-all.cc"
+},
+{
+  "directory": "/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/gtest/googletest",
+  "command": "/usr/bin/c++  -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgtest_main_EXPORTS -isystem /usr/src/googletest/googletest/include -isystem /usr/src/googletest/googletest  -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O3 -DNDEBUG -fPIC   -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -Wall -Wshadow -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -pthread -DGTEST_HAS_PTHREAD=1 -std=c++11 -o CMakeFiles/gtest_main.dir/src/gtest_main.cc.o -c /usr/src/googletest/googletest/src/gtest_main.cc",
+  "file": "/usr/src/googletest/googletest/src/gtest_main.cc"
+},
+{
+  "directory": "/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/gtest/googletest",
+  "command": "/usr/bin/c++  -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgtest_EXPORTS -I/usr/src/googletest/googletest/include -I/usr/src/googletest/googletest  -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O3 -DNDEBUG -fPIC   -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -Wall -Wshadow -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -pthread -std=c++11 -o CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /usr/src/googletest/googletest/src/gtest-all.cc",
+  "file": "/usr/src/googletest/googletest/src/gtest-all.cc"
+}
+]

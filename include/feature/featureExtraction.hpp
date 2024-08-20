@@ -4,34 +4,14 @@
 #include "../utility.h"
 #include <livox_ros_driver/CustomMsg.h>
 
-enum Feature{Nor, Poss_Plane, Real_Plane, Edge_Jump, Edge_Plane, Wire, ZeroPoint};
-enum Surround{Prev, Next};
-enum E_jump{Nr_nor, Nr_zero, Nr_180, Nr_inf, Nr_blind};
-
-struct orgtype {
-  double range;
-  double dista; 
-  double angle[2];
-  double intersect;
-  E_jump edj[2];
-  Feature ftype;
-  orgtype() {
-    range = 0;
-    edj[Prev] = Nr_nor;
-    edj[Next] = Nr_nor;
-    ftype = Nor;
-    intersect = 2;
-  }
-};
-
-const double rad2deg = 180 * M_1_PI;
-
 class FeatureExtraction : public ParamServer {
 public:
     ros::Subscriber sub_points;
     ros::Publisher pub_full;
     ros::Publisher pub_surf;
     ros::Publisher pub_corn;
+
+    const double rad2deg = 180 * M_1_PI;
 
     double vx, vy, vz;
 
@@ -64,7 +44,7 @@ public:
             orders[i + N_SCAN / 2] = i * 2 + 1;
         }
 
-        pcl::PointCloud<pcl::PointXYZI> pl_orig;
+        pcl::PointCloud<PointType> pl_orig;
         pcl::fromROSMsg(*msg, pl_orig);
         uint plsize = pl_orig.size();
 
@@ -82,7 +62,7 @@ public:
         }
 
         for (uint i = 0; i < plsize; i++) {
-            pcl::PointXYZI &ap = pl_orig[i];
+            PointType &ap = pl_orig[i];
             double leng = sqrt(ap.x * ap.x + ap.y * ap.y);
             if (leng < blind) {
                 continue;
@@ -516,11 +496,11 @@ public:
             v1[1] = pl[j].y - pl[i_cur].y;
             v1[2] = pl[j].z - pl[i_cur].z;
 
-            v2[0] = v1[1]*vz - vy*v1[2];
-            v2[1] = v1[2]*vx - v1[0]*vz;
-            v2[2] = v1[0]*vy - vx*v1[1];
+            v2[0] = v1[1] * vz - vy * v1[2];
+            v2[1] = v1[2] * vx - v1[0] * vz;
+            v2[2] = v1[0] * vy - vx * v1[1];
 
-            double lw = v2[0]*v2[0] + v2[1]*v2[1] + v2[2]*v2[2];
+            double lw = v2[0] * v2[0] + v2[1] * v2[1] + v2[2] * v2[2];
             if (lw > leng_wid) {
                 leng_wid = lw;
             }

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="(empty)"
+	BuildStamp="20240819-0543-Experimental"
+	Name="Yixin"
+	Generator="ctest-3.16.3"
+	CompilerName="/usr/bin/c++"
+	CompilerVersion="9.4.0"
+	OSName="Linux"
+	Hostname="Yixin"
+	OSRelease="5.15.0-117-generic"
+	OSVersion="#127~20.04.1-Ubuntu SMP Thu Jul 11 15:36:12 UTC 2024"
+	OSPlatform="x86_64"
+	Is64Bits="1"
+	VendorString="AuthenticAMD"
+	VendorID="Advanced Micro Devices"
+	FamilyID="25"
+	ModelID="116"
+	ProcessorCacheSize="1024"
+	NumberOfLogicalCPU="16"
+	NumberOfPhysicalCPU="8"
+	TotalVirtualMemory="48827"
+	TotalPhysicalMemory="47471"
+	LogicalProcessorsPerPhysical="2"
+	ProcessorClockFrequency="1600"
+	>
+	<Testing>
+		<StartDateTime>Aug 19 17:01 CST</StartDateTime>
+		<StartTestTime>1724058119</StartTestTime>
+		<TestList/>
+		<EndDateTime>Aug 19 17:01 CST</EndDateTime>
+		<EndTestTime>1724058119</EndTestTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Testing>
+</Site>

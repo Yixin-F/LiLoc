@@ -1,2 +1,6 @@
 2024.8.10 
 problems in imu odometry, maybe there are something wrong in fucntion imu_converter. 
+
+2024.8.13
+problems undisortion  ->>  learn that from ig-lio
+should have to process the lidar and imu data previously ?? like ig-lio ??
