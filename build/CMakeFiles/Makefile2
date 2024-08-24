@@ -53,8 +53,9 @@ CMAKE_BINARY_DIR = /home/yixin/icra_ws/src/Block-Map-Based-Localization/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/liloc.dir/all
+all: CMakeFiles/preprocess.dir/all
 all: CMakeFiles/block_localization_generate_messages.dir/all
-all: CMakeFiles/main.dir/all
 all: CMakeFiles/ikd_Tree.dir/all
 all: gtest/all
 
@@ -66,6 +67,8 @@ preinstall: gtest/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/liloc.dir/clean
+clean: CMakeFiles/preprocess.dir/clean
 clean: CMakeFiles/block_localization_generate_messages_py.dir/clean
 clean: CMakeFiles/block_localization_generate_messages_lisp.dir/clean
 clean: CMakeFiles/block_localization_generate_messages_eus.dir/clean
@@ -128,7 +131,6 @@ clean: CMakeFiles/doxygen.dir/clean
 clean: CMakeFiles/rosgraph_msgs_generate_messages_py.dir/clean
 clean: CMakeFiles/nodelet_generate_messages_cpp.dir/clean
 clean: CMakeFiles/nodelet_generate_messages_eus.dir/clean
-clean: CMakeFiles/main.dir/clean
 clean: CMakeFiles/actionlib_generate_messages_nodejs.dir/clean
 clean: CMakeFiles/std_srvs_generate_messages_nodejs.dir/clean
 clean: CMakeFiles/nodelet_generate_messages_py.dir/clean
@@ -229,6 +231,60 @@ gtest/googletest/clean: gtest/googletest/CMakeFiles/gtest_main.dir/clean
 gtest/googletest/clean: gtest/googletest/CMakeFiles/gtest.dir/clean
 
 .PHONY : gtest/googletest/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/liloc.dir
+
+# All Build rule for target.
+CMakeFiles/liloc.dir/all: CMakeFiles/ikd_Tree.dir/all
+	$(MAKE) -f CMakeFiles/liloc.dir/build.make CMakeFiles/liloc.dir/depend
+	$(MAKE) -f CMakeFiles/liloc.dir/build.make CMakeFiles/liloc.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/CMakeFiles --progress-num=24,25 "Built target liloc"
+.PHONY : CMakeFiles/liloc.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/liloc.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/yixin/icra_ws/src/Block-Map-Based-Localization/build/CMakeFiles 4
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/liloc.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/yixin/icra_ws/src/Block-Map-Based-Localization/build/CMakeFiles 0
+.PHONY : CMakeFiles/liloc.dir/rule
+
+# Convenience name for target.
+liloc: CMakeFiles/liloc.dir/rule
+
+.PHONY : liloc
+
+# clean rule for target.
+CMakeFiles/liloc.dir/clean:
+	$(MAKE) -f CMakeFiles/liloc.dir/build.make CMakeFiles/liloc.dir/clean
+.PHONY : CMakeFiles/liloc.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/preprocess.dir
+
+# All Build rule for target.
+CMakeFiles/preprocess.dir/all: CMakeFiles/ikd_Tree.dir/all
+	$(MAKE) -f CMakeFiles/preprocess.dir/build.make CMakeFiles/preprocess.dir/depend
+	$(MAKE) -f CMakeFiles/preprocess.dir/build.make CMakeFiles/preprocess.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/CMakeFiles --progress-num=26,27 "Built target preprocess"
+.PHONY : CMakeFiles/preprocess.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/preprocess.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/yixin/icra_ws/src/Block-Map-Based-Localization/build/CMakeFiles 4
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/preprocess.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/yixin/icra_ws/src/Block-Map-Based-Localization/build/CMakeFiles 0
+.PHONY : CMakeFiles/preprocess.dir/rule
+
+# Convenience name for target.
+preprocess: CMakeFiles/preprocess.dir/rule
+
+.PHONY : preprocess
+
+# clean rule for target.
+CMakeFiles/preprocess.dir/clean:
+	$(MAKE) -f CMakeFiles/preprocess.dir/build.make CMakeFiles/preprocess.dir/clean
+.PHONY : CMakeFiles/preprocess.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/block_localization_generate_messages_py.dir
@@ -1932,33 +1988,6 @@ nodelet_generate_messages_eus: CMakeFiles/nodelet_generate_messages_eus.dir/rule
 CMakeFiles/nodelet_generate_messages_eus.dir/clean:
 	$(MAKE) -f CMakeFiles/nodelet_generate_messages_eus.dir/build.make CMakeFiles/nodelet_generate_messages_eus.dir/clean
 .PHONY : CMakeFiles/nodelet_generate_messages_eus.dir/clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/main.dir
-
-# All Build rule for target.
-CMakeFiles/main.dir/all: CMakeFiles/ikd_Tree.dir/all
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/depend
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/CMakeFiles --progress-num=24,25 "Built target main"
-.PHONY : CMakeFiles/main.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/main.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/yixin/icra_ws/src/Block-Map-Based-Localization/build/CMakeFiles 4
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/main.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/yixin/icra_ws/src/Block-Map-Based-Localization/build/CMakeFiles 0
-.PHONY : CMakeFiles/main.dir/rule
-
-# Convenience name for target.
-main: CMakeFiles/main.dir/rule
-
-.PHONY : main
-
-# clean rule for target.
-CMakeFiles/main.dir/clean:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/clean
-.PHONY : CMakeFiles/main.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/actionlib_generate_messages_nodejs.dir

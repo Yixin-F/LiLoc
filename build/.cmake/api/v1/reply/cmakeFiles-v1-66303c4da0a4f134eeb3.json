@@ -1795,21 +1795,6 @@
 			"path" : "/usr/local/lib/cmake/GTSAM/gtsam_extra.cmake"
 		},
 		{
-			"isCMake" : true,
-			"isExternal" : true,
-			"path" : "/usr/share/cmake-3.16/Modules/FindBoost.cmake"
-		},
-		{
-			"isCMake" : true,
-			"isExternal" : true,
-			"path" : "/usr/share/cmake-3.16/Modules/FindPackageHandleStandardArgs.cmake"
-		},
-		{
-			"isCMake" : true,
-			"isExternal" : true,
-			"path" : "/usr/share/cmake-3.16/Modules/FindPackageMessage.cmake"
-		},
-		{
 			"isExternal" : true,
 			"path" : "/opt/ros/noetic/share/genmsg/cmake/pkg-msg-paths.cmake.develspace.in"
 		},

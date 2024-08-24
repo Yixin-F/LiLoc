@@ -59,8 +59,8 @@ CMakeFiles/block_localization_generate_messages_cpp: devel/include/block_localiz
 
 devel/include/block_localization/cloud_info.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 devel/include/block_localization/cloud_info.h: ../msg/cloud_info.msg
-devel/include/block_localization/cloud_info.h: /opt/ros/noetic/share/sensor_msgs/msg/PointField.msg
 devel/include/block_localization/cloud_info.h: /opt/ros/noetic/share/sensor_msgs/msg/PointCloud2.msg
+devel/include/block_localization/cloud_info.h: /opt/ros/noetic/share/sensor_msgs/msg/PointField.msg
 devel/include/block_localization/cloud_info.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 devel/include/block_localization/cloud_info.h: /opt/ros/noetic/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating C++ code from block_localization/cloud_info.msg"

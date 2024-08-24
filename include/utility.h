@@ -36,8 +36,19 @@
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
 
-#include <boost/circular_buffer.hpp>
-#include <boost/format.hpp>
+#include <gtsam/geometry/Pose3.h>
+#include <gtsam/geometry/Rot3.h>
+#include <gtsam/inference/Symbol.h>
+#include <gtsam/navigation/CombinedImuFactor.h>
+#include <gtsam/navigation/ImuFactor.h>
+#include <gtsam/nonlinear/ISAM2.h>
+#include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
+#include <gtsam/nonlinear/Marginals.h>
+#include <gtsam/nonlinear/NonlinearFactorGraph.h>
+#include <gtsam/nonlinear/Values.h>
+#include <gtsam/slam/BetweenFactor.h>
+#include <gtsam/slam/PriorFactor.h>
+#include <gtsam_unstable/nonlinear/IncrementalFixedLagSmoother.h>
 
 #include <vector>
 #include <cmath>
@@ -62,6 +73,10 @@
 
 #include "ikd-Tree/ikd_Tree.h"
 #include "math_tools.h"
+
+using gtsam::symbol_shorthand::B;  // Bias  (ax, ay, az, gx, gy, gz)
+using gtsam::symbol_shorthand::V;  // Vel   (xdot, ydot, zdot)
+using gtsam::symbol_shorthand::X;  // Pose3 (x, y, z, r, p, y)
 
 namespace fs = std::experimental::filesystem;
 
@@ -166,8 +181,12 @@ struct SensorMeasurement {
     double lidar_end_time_{0.0};
 
     pcl::PointCloud<PointType>::Ptr cloud_ptr_{};
+    pcl::PointCloud<PointType>::Ptr cloud_deskewed_ptr_{};
+
     pcl::PointCloud<PointType>::Ptr plane_ptr_{};
     pcl::PointCloud<PointType>::Ptr edge_ptr_{};
+
+    std::deque<nav_msgs::Odometry> odom_buff_;
 
     std::deque<sensor_msgs::Imu> imu_buff_;
 };
@@ -220,10 +239,19 @@ public:
 
 State ext_state;
 
+
+
+nav_msgs::Path ImuOdomPath;
+nav_msgs::Path LidarOdomPath;
+
 class ParamServer {
 public:
 
     ros::NodeHandle nh;
+
+    // tf and frame_ids
+tf::TransformBroadcaster pose_broadcaster;
+tf::TransformListener tf_listener;
 
     int robot_id;  // online multi-session exploration
     std::string root_suffix;  // lifelong localization with prior knowledge
@@ -407,20 +435,59 @@ public:
 
         // rotate acceleration
         Eigen::Vector3d acc(imu_in.linear_acceleration.x, imu_in.linear_acceleration.y, imu_in.linear_acceleration.z);
-        acc = extRot_inv * acc;
+        acc = extRot * acc;
         imu_out.linear_acceleration.x = acc.x();
         imu_out.linear_acceleration.y = acc.y();
         imu_out.linear_acceleration.z = acc.z();
 
         // rotate gyroscope
         Eigen::Vector3d gyr(imu_in.angular_velocity.x, imu_in.angular_velocity.y, imu_in.angular_velocity.z);
-        gyr = extRot_inv * gyr;
+        gyr = extRot * gyr;
         imu_out.angular_velocity.x = gyr.x();
         imu_out.angular_velocity.y = gyr.y();
         imu_out.angular_velocity.z = gyr.z();
 
         return imu_out;
     }
+
+
+void publishPath(const ros::Publisher &pub_path, const ros::Publisher &pub_odom, nav_msgs::Path& path, const gtsam::Pose3& pose, ros::Time thisStamp, std::string father, std::string child) {
+    Eigen::Quaterniond quat(pose.rotation().toQuaternion().w(), pose.rotation().toQuaternion().x(), pose.rotation().toQuaternion().y(), pose.rotation().toQuaternion().z());
+    quat.normalize();
+    geometry_msgs::Quaternion odom_quat;
+    odom_quat.w = quat.w();
+    odom_quat.x = quat.x();
+    odom_quat.y = quat.y();
+    odom_quat.z = quat.z();
+
+    geometry_msgs::TransformStamped odom_trans;
+    odom_trans.header.stamp = thisStamp;
+    odom_trans.header.frame_id = father;
+    odom_trans.child_frame_id = child + "_tf";
+    odom_trans.transform.translation.x = pose.x();
+    odom_trans.transform.translation.y = pose.y();
+    odom_trans.transform.translation.z = pose.z();
+    odom_trans.transform.rotation = odom_quat;
+    pose_broadcaster.sendTransform(odom_trans);
+
+    nav_msgs::Odometry odometryROS;
+    odometryROS.header.stamp = thisStamp;
+    odometryROS.header.frame_id = father;
+    odometryROS.child_frame_id = child + "_odom";
+    odometryROS.pose.pose.position.x = pose.translation().x();
+    odometryROS.pose.pose.position.y = pose.translation().y();
+    odometryROS.pose.pose.position.z = pose.translation().z();
+    odometryROS.pose.pose.orientation = odom_quat;
+    pub_odom.publish(odometryROS);
+
+    geometry_msgs::PoseStamped Pose;
+    Pose.header = odometryROS.header;
+    Pose.pose = odometryROS.pose.pose;
+    path.header.stamp = odometryROS.header.stamp;
+    path.poses.push_back(Pose);
+    path.header.frame_id = father;
+    pub_path.publish(path);
+}
 };
 
 template<typename T>
@@ -433,6 +500,7 @@ sensor_msgs::PointCloud2 publishCloud(const ros::Publisher &thisPub, const T &th
         thisPub.publish(tempCloud);
     return tempCloud;
 }
+
 
 template<typename T>
 double ROS_TIME(T msg) {

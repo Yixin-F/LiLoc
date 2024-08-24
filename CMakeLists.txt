@@ -37,7 +37,6 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(PCL REQUIRED)
 find_package(GTSAM REQUIRED QUIET)
-find_package(Boost REQUIRED)
 
 add_message_files(
   DIRECTORY msg
@@ -99,7 +98,6 @@ include_directories(include)
 include_directories(
   ${GTSAM_INCLUDE_DIR}
   ${catkin_INCLUDE_DIRS}
-  ${YAML_INCLUDE_DIRS}
 )
 
 # nodelets
@@ -141,12 +139,20 @@ include_directories(
 
 add_library(ikd_Tree include/ikd-Tree/ikd_Tree.cpp)
 
-add_executable(main src/main.cpp)
-target_link_libraries(main
+add_executable(preprocess src/preprocess_node.cpp)
+target_link_libraries(preprocess
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
   gtsam
-  tbb
+  ikd_Tree
+  stdc++fs
+)
+
+add_executable(liloc src/liloc_node.cpp)
+target_link_libraries(liloc
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
+  gtsam
   ikd_Tree
   stdc++fs
 )

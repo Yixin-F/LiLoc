@@ -5,7 +5,7 @@
     <!-- params -->
     <rosparam file="$(find block_localization)/config/params.yaml" command="load" />
 
-    <!-- nodelet -->
-    <node pkg="block_localization" type="main" name="main" output="screen" />
+    <!-- preprocess nodelet -->
+    <node pkg="block_localization" type="preprocess" name="preprocess" output="screen" />
 
 </launch>

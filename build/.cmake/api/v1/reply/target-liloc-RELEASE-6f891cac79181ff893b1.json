@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "devel/lib/block_localization/main"
+			"path" : "devel/lib/block_localization/liloc"
 		}
 	],
 	"backtrace" : 1,
@@ -50,19 +50,19 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 144,
+				"line" : 151,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 145,
+				"line" : 152,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 64,
+				"line" : 63,
 				"parent" : 0
 			},
 			{
@@ -222,7 +222,7 @@
 			{
 				"command" : 12,
 				"file" : 0,
-				"line" : 54,
+				"line" : 53,
 				"parent" : 0
 			},
 			{
@@ -256,13 +256,13 @@
 			{
 				"command" : 9,
 				"file" : 0,
-				"line" : 98,
+				"line" : 97,
 				"parent" : 0
 			},
 			{
 				"command" : 9,
 				"file" : 0,
-				"line" : 99,
+				"line" : 98,
 				"parent" : 0
 			},
 			{
@@ -274,7 +274,7 @@
 			{
 				"command" : 9,
 				"file" : 0,
-				"line" : 62,
+				"line" : 61,
 				"parent" : 0
 			}
 		]
@@ -409,7 +409,7 @@
 			"id" : "ikd_Tree::@6890427a1f51a3e7e1df"
 		}
 	],
-	"id" : "main::@6890427a1f51a3e7e1df",
+	"id" : "liloc::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -1075,10 +1075,6 @@
 			{
 				"backtrace" : 2,
 				"fragment" : "/usr/local/lib/libgtsam.so.4.2.0",
-				"role" : "libraries"
-			},
-			{
-				"fragment" : "-ltbb",
 				"role" : "libraries"
 			},
 			{
@@ -1854,10 +1850,6 @@
 				"role" : "libraries"
 			},
 			{
-				"fragment" : "-ltbb",
-				"role" : "libraries"
-			},
-			{
 				"fragment" : "/usr/lib/x86_64-linux-gnu/libboost_serialization.so",
 				"role" : "libraries"
 			},
@@ -1898,6 +1890,10 @@
 				"role" : "libraries"
 			},
 			{
+				"fragment" : "-ltbb",
+				"role" : "libraries"
+			},
+			{
 				"fragment" : "-ltbbmalloc",
 				"role" : "libraries"
 			},
@@ -1912,8 +1908,8 @@
 		],
 		"language" : "CXX"
 	},
-	"name" : "main",
-	"nameOnDisk" : "main",
+	"name" : "liloc",
+	"nameOnDisk" : "liloc",
 	"paths" : 
 	{
 		"build" : ".",
@@ -1934,7 +1930,7 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "src/main.cpp",
+			"path" : "src/liloc_node.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],

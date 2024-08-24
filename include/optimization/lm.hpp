@@ -29,6 +29,10 @@ public:
     void allocateMemory() {
         normvec.reset(new pcl::PointCloud<PointType>(100000, 1));
         dirvec.reset(new pcl::PointCloud<PointType>(100000, 1));
+
+        near_edge.resize(100000, KD_TREE<PointType>::PointVector { });
+        near_surf.resize(100000, KD_TREE<PointType>::PointVector { });
+
         effect_surf.reset(new pcl::PointCloud<PointType>(100000, 1));
         coeff_surf.reset(new pcl::PointCloud<PointType>(100000, 1));
         effect_edge.reset(new pcl::PointCloud<PointType>(100000, 1));
@@ -46,11 +50,32 @@ public:
             reset();
 
             edgeOptimization(edge_tree_lio, edge_cloud, cur_state);
+
             surfOptimization(surf_tree_lio, surf_cloud, cur_state);
 
             combineOptimizationCoeffs();
 
             if (LMOptimization(iter, cur_state)) {
+                KD_TREE<PointType>::PointVector edge_add;
+                edge_add.reserve(edge_cloud->size());
+                for (size_t i = 0; i < edge_cloud->size(); i++) {
+                    PointType pointOri, pointWorld;
+                    pointAssociateToMap(&pointOri, &pointWorld, cur_state);
+                    edge_add.push_back(pointWorld);
+                }
+                edge_tree_lio->Add_Points(edge_add, false);
+
+                KD_TREE<PointType>::PointVector surf_add;
+                surf_add.reserve(surf_cloud->size());
+                for (size_t i = 0; i < surf_cloud->size(); i++) {
+                    PointType pointOri, pointWorld;
+                    pointAssociateToMap(&pointOri, &pointWorld, cur_state);
+                    surf_add.push_back(pointWorld);
+                }
+                surf_tree_lio->Add_Points(surf_add, false);
+
+                std::cout << "optimization ok" << std::endl;
+
                 break;
             }
         }
@@ -61,6 +86,7 @@ public:
 
         #pragma omp parallel for num_threads(numberOfCores)
         for (size_t i = 0; i < edge_cloud_size; i++) {
+
             PointType pointOri, pointWorld, coeff;
             pointOri = edge_cloud->points[i];
             pointAssociateToMap(&pointOri, &pointWorld, cur_state);
@@ -290,18 +316,21 @@ public:
         std::fill(std::begin(point_selected_edge), std::end(point_selected_edge), false);
         std::fill(std::begin(point_selected_surf), std::end(point_selected_surf), false);
 
-        normvec->clear();
-        dirvec->clear();
+        normvec.reset(new pcl::PointCloud<PointType>(100000, 1));
+        dirvec.reset(new pcl::PointCloud<PointType>(100000, 1));
 
         near_edge.clear();
         near_surf.clear();
+        near_edge.resize(100000, KD_TREE<PointType>::PointVector { });
+        near_surf.resize(100000, KD_TREE<PointType>::PointVector { });
 
-        effect_surf->clear();
-        coeff_surf->clear();
-        effect_edge->clear();
-        coeff_edge->clear();
-        effect_all->clear();
-        coeff_all->clear();
+        effect_surf.reset(new pcl::PointCloud<PointType>(100000, 1));
+        coeff_surf.reset(new pcl::PointCloud<PointType>(100000, 1));
+        effect_edge.reset(new pcl::PointCloud<PointType>(100000, 1));
+        coeff_edge.reset(new pcl::PointCloud<PointType>(100000, 1));
+
+        effect_all.reset(new pcl::PointCloud<PointType>());
+        coeff_all.reset(new pcl::PointCloud<PointType>());
 
         edge_cloud_size = 0;
         surf_cloud_size = 0;

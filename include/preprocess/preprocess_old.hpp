@@ -11,7 +11,7 @@ public:
     ros::Publisher pub_full;
     ros::Publisher pub_surf;
     ros::Publisher pub_corn;
-
+.
     std::mutex buff_mutex;
 
     std::deque<std::pair<double, pcl::PointCloud<PointType>::Ptr>> cloud_buff;
@@ -58,7 +58,7 @@ public:
         // sensor_msgs::Imu msg_aligned = imuConverter(*msg);
         // msg = std::move(&msg_aligned);
 
-        static double last_imu_timestamp = 0.0;
+        static double last_imu_timestamp = -1.0;
         static sensor_msgs::Imu last_imu = *msg;
 
         // parameters for EMA filter
@@ -73,13 +73,13 @@ public:
             imu_buff.clear();
         }
 
-        last_imu_timestamp = imu_timestamp;
-
         // EMA filter for accelerometer
         imu_msg.linear_acceleration.x = msg->linear_acceleration.x * a + last_imu.linear_acceleration.x * b;
         imu_msg.linear_acceleration.y = msg->linear_acceleration.y * a + last_imu.linear_acceleration.y * b;
         imu_msg.linear_acceleration.z = msg->linear_acceleration.z * a + last_imu.linear_acceleration.z * b;
+
         last_imu = *msg;
+        last_imu_timestamp = imu_timestamp;
 
         imu_buff.push_back(imu_msg);
     }

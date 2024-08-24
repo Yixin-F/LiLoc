@@ -168,6 +168,32 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named liloc
+
+# Build rule for target.
+liloc: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 liloc
+.PHONY : liloc
+
+# fast build rule for target.
+liloc/fast:
+	$(MAKE) -f CMakeFiles/liloc.dir/build.make CMakeFiles/liloc.dir/build
+.PHONY : liloc/fast
+
+#=============================================================================
+# Target rules for targets named preprocess
+
+# Build rule for target.
+preprocess: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 preprocess
+.PHONY : preprocess
+
+# fast build rule for target.
+preprocess/fast:
+	$(MAKE) -f CMakeFiles/preprocess.dir/build.make CMakeFiles/preprocess.dir/build
+.PHONY : preprocess/fast
+
+#=============================================================================
 # Target rules for targets named block_localization_generate_messages_py
 
 # Build rule for target.
@@ -974,19 +1000,6 @@ nodelet_generate_messages_eus/fast:
 .PHONY : nodelet_generate_messages_eus/fast
 
 #=============================================================================
-# Target rules for targets named main
-
-# Build rule for target.
-main: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 main
-.PHONY : main
-
-# fast build rule for target.
-main/fast:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
-.PHONY : main/fast
-
-#=============================================================================
 # Target rules for targets named actionlib_generate_messages_nodejs
 
 # Build rule for target.
@@ -1585,32 +1598,59 @@ include/ikd-Tree/ikd_Tree.cpp.s:
 	$(MAKE) -f CMakeFiles/ikd_Tree.dir/build.make CMakeFiles/ikd_Tree.dir/include/ikd-Tree/ikd_Tree.cpp.s
 .PHONY : include/ikd-Tree/ikd_Tree.cpp.s
 
-src/main.o: src/main.cpp.o
+src/liloc_node.o: src/liloc_node.cpp.o
 
-.PHONY : src/main.o
+.PHONY : src/liloc_node.o
 
 # target to build an object file
-src/main.cpp.o:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
+src/liloc_node.cpp.o:
+	$(MAKE) -f CMakeFiles/liloc.dir/build.make CMakeFiles/liloc.dir/src/liloc_node.cpp.o
+.PHONY : src/liloc_node.cpp.o
 
-src/main.i: src/main.cpp.i
+src/liloc_node.i: src/liloc_node.cpp.i
 
-.PHONY : src/main.i
+.PHONY : src/liloc_node.i
 
 # target to preprocess a source file
-src/main.cpp.i:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
+src/liloc_node.cpp.i:
+	$(MAKE) -f CMakeFiles/liloc.dir/build.make CMakeFiles/liloc.dir/src/liloc_node.cpp.i
+.PHONY : src/liloc_node.cpp.i
 
-src/main.s: src/main.cpp.s
+src/liloc_node.s: src/liloc_node.cpp.s
 
-.PHONY : src/main.s
+.PHONY : src/liloc_node.s
 
 # target to generate assembly for a file
-src/main.cpp.s:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
+src/liloc_node.cpp.s:
+	$(MAKE) -f CMakeFiles/liloc.dir/build.make CMakeFiles/liloc.dir/src/liloc_node.cpp.s
+.PHONY : src/liloc_node.cpp.s
+
+src/preprocess_node.o: src/preprocess_node.cpp.o
+
+.PHONY : src/preprocess_node.o
+
+# target to build an object file
+src/preprocess_node.cpp.o:
+	$(MAKE) -f CMakeFiles/preprocess.dir/build.make CMakeFiles/preprocess.dir/src/preprocess_node.cpp.o
+.PHONY : src/preprocess_node.cpp.o
+
+src/preprocess_node.i: src/preprocess_node.cpp.i
+
+.PHONY : src/preprocess_node.i
+
+# target to preprocess a source file
+src/preprocess_node.cpp.i:
+	$(MAKE) -f CMakeFiles/preprocess.dir/build.make CMakeFiles/preprocess.dir/src/preprocess_node.cpp.i
+.PHONY : src/preprocess_node.cpp.i
+
+src/preprocess_node.s: src/preprocess_node.cpp.s
+
+.PHONY : src/preprocess_node.s
+
+# target to generate assembly for a file
+src/preprocess_node.cpp.s:
+	$(MAKE) -f CMakeFiles/preprocess.dir/build.make CMakeFiles/preprocess.dir/src/preprocess_node.cpp.s
+.PHONY : src/preprocess_node.cpp.s
 
 # Help Target
 help:
@@ -1620,7 +1660,9 @@ help:
 	@echo "... depend"
 	@echo "... install/strip"
 	@echo "... list_install_components"
+	@echo "... liloc"
 	@echo "... rebuild_cache"
+	@echo "... preprocess"
 	@echo "... block_localization_generate_messages_py"
 	@echo "... block_localization_generate_messages_lisp"
 	@echo "... block_localization_generate_messages_eus"
@@ -1686,7 +1728,6 @@ help:
 	@echo "... rosgraph_msgs_generate_messages_py"
 	@echo "... nodelet_generate_messages_cpp"
 	@echo "... nodelet_generate_messages_eus"
-	@echo "... main"
 	@echo "... actionlib_generate_messages_nodejs"
 	@echo "... std_srvs_generate_messages_nodejs"
 	@echo "... nodelet_generate_messages_py"
@@ -1735,9 +1776,12 @@ help:
 	@echo "... include/ikd-Tree/ikd_Tree.o"
 	@echo "... include/ikd-Tree/ikd_Tree.i"
 	@echo "... include/ikd-Tree/ikd_Tree.s"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
+	@echo "... src/liloc_node.o"
+	@echo "... src/liloc_node.i"
+	@echo "... src/liloc_node.s"
+	@echo "... src/preprocess_node.o"
+	@echo "... src/preprocess_node.i"
+	@echo "... src/preprocess_node.s"
 .PHONY : help
 
 
