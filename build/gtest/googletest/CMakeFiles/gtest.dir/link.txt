@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O3 -DNDEBUG  -shared -Wl,-soname,libgtest.so -o ../lib/libgtest.so CMakeFiles/gtest.dir/src/gtest-all.cc.o  -pthread 

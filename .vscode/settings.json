@@ -1,7 +1,5 @@
 {
-    "C_Cpp.errorSquiggles": "disabled",
     "files.associations": {
-        "ostream": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",
@@ -21,10 +19,12 @@
         "*.tcc": "cpp",
         "bitset": "cpp",
         "chrono": "cpp",
+        "codecvt": "cpp",
         "complex": "cpp",
         "condition_variable": "cpp",
         "cstdint": "cpp",
         "deque": "cpp",
+        "forward_list": "cpp",
         "list": "cpp",
         "map": "cpp",
         "set": "cpp",
@@ -50,6 +50,7 @@
         "hash_map": "cpp",
         "hash_set": "cpp",
         "fstream": "cpp",
+        "future": "cpp",
         "initializer_list": "cpp",
         "iomanip": "cpp",
         "iosfwd": "cpp",
@@ -58,6 +59,7 @@
         "limits": "cpp",
         "mutex": "cpp",
         "new": "cpp",
+        "ostream": "cpp",
         "shared_mutex": "cpp",
         "sstream": "cpp",
         "stdexcept": "cpp",
@@ -67,12 +69,7 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp",
-        "*.ipp": "cpp",
-        "codecvt": "cpp",
-        "future": "cpp",
         "valarray": "cpp",
-        "core": "cpp",
-        "numericaldiff": "cpp"
+        "variant": "cpp"
     }
 }

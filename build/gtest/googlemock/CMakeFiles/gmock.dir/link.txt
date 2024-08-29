@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -std=c++17 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -O3 -DNDEBUG  -shared -Wl,-soname,libgmock.so -o ../lib/libgmock.so CMakeFiles/gmock.dir/src/gmock-all.cc.o  -Wl,-rpath,/home/yixin/icra_ws/src/Block-Map-Based-Localization/build/gtest/lib ../lib/libgtest.so -pthread 
