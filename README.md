@@ -40,7 +40,7 @@ In this work, we propose a versatile graph-based lifelong localization framework
 #### 1.2 Other Packages
 - [ndt_omp](https://github.com/koide3/ndt_omp)
 - [livox_ros_driver](https://github.com/Livox-SDK/livox_ros_driver)
-- [better_fastlio2](https://github.com/Yixin-F/better_fastlio2) (Refer to the module of "pose initialization" in this open-source repositories, the new reconstructed code is comming soon.)
+- [better_fastlio2](https://github.com/Yixin-F/better_fastlio2) (Refer to the module of "pose initialization" in this open-source repository, the new reconstructed code is comming soon.)
 
 ### 2. Build
 ```bash
@@ -66,6 +66,8 @@ or
 ```bash
 rosservice call /liloc/save_session 0.2  # save results of the updated central session
 ```
+###  <strong>Remark 3:</strong> How to set initial pose ?
+Since our code of "pose initailization" is under reconstrucion, you can directly use the "2D pose estimation" or refer to our previous repository named [better_fastlio2](https://github.com/Yixin-F/better_fastlio2) to set the initial pose. The reconstructed code will be publicly aviliable as soon as possible.
 
 ### 1. NCLT dataset
 Download NCLT from [https://robots.engin.umich.edu/nclt/](https://robots.engin.umich.edu/nclt/)
