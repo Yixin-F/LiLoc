@@ -1,0 +1,75 @@
+System:
+  pointCloudTopic: "points_raw" 
+  imuTopic: "imu_raw"
+  odomTopic: "odometry/imu"
+
+  numberOfCores: 8
+
+  mode: "relo"                                  # "lio" or "relo"
+
+  lidarFrame: "base_link"
+  baselinkFrame: "base_link"
+  odometryFrame: "odom"
+  mapFrame: "map"
+
+  savePCDDirectory: "/home/yixin/lio-sam/src/data"
+  saveSessionDirectory: "/home/yixin/lio-sam/src/session"
+
+Sensors:
+  sensor: velodyne                              # lidar sensor type, 'velodyne' or 'ouster' or 'livox' or 'robosense'
+  N_SCAN: 32                                    # number of lidar channel (i.e., Velodyne/Ouster: 16, 32, 64, 128, Horizon: 6, mid40: 1, mid360: 4, avia: 8)
+  Horizon_SCAN: 1800                            # lidar horizontal resolution (Velodyne: 1800, Ouster: 512, 1024, 2048)
+
+  have_ring_time_channel: false                  # some datasets, such as nclt and m2dgr has no ring or time channel
+
+  downsampleRate: 1                             # default: 1. e.g., 16: 1, 32: 2, 64: 4
+  point_filter_num: 1                           # default: 1. e.g., 16: 1, 32: 2, 64: 4
+
+  lidarMinRange: 1.0                            # default: 1.0
+  lidarMaxRange: 100.0                          # default: 100.0
+
+  imuType: 0                                    # 0: 6-axis (default)  1: 9-axis
+  imuRate: 100.0
+  imuAccNoise: 3.9939570888238808e-03
+  imuGyrNoise: 1.5636343949698187e-03
+  imuAccBiasN: 6.4356659353532566e-05
+  imuGyrBiasN: 3.5640318696367613e-05
+  imuGravity: 9.80511
+  imuRPYWeight: 0.01
+
+  correct: false
+
+  # Extrinsics: (lidar -> imu)
+  extrinsicTrans: [ 0, 0, 0.28 ]
+  extrinsicRot: [ 1, 0, 0,
+                  0, 1, 0,
+                  0, 0, 1]
+  
+  # Extrinsics: 9-axis
+  extrinsicRPY: [ 1,  0,  0,
+                  0,  1,  0,
+                  0,  0,  1 ]
+  
+Mapping:
+  z_tollerance: 1000                            # meters
+  rotation_tollerance: 1000                     # radians
+
+  regMethod: "DIRECT1"                          # "DIRECT1", "DIRECT7", "GICP_OMP", "KDTREE"
+  ndtResolution: 2.0                            # meters
+  ndtEpsilon: 0.01
+
+  timeInterval: 0.2                             # seconds, relo interval
+
+  mappingProcessInterval: 0.0                   # seconds, mapping interval
+
+  mappingSurfLeafSize: 0.4                      # default: 0.4 - outdoor, 0.2 - indoor
+
+  surroundingkeyframeAddingDistThreshold: 1.0   # meters, regulate keyframe adding threshold
+  surroundingkeyframeAddingAngleThreshold: 0.2  # radians, regulate keyframe adding threshold
+  surroundingKeyframeDensity: 2.0               # meters, downsample surrounding keyframe poses   
+  surroundingKeyframeSearchRadius: 20.0         # meters, within n meters scan-to-map optimization (when loop closure disabled)
+  surroundingKeyframeMapLeafSize: 0.4           # downsample local map point cloud
+
+  globalMapVisualizationSearchRadius: 1000.0    # meters, global map visualization radius
+  globalMapVisualizationPoseDensity: 10.0       # meters, global map visualization keyframe density
+  globalMapVisualizationLeafSize: 0.4           # meters, global map visualization cloud density

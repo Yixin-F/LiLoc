@@ -1,0 +1,6 @@
+float32 resolution
+int32 savecloud
+int32 savepath
+
+---
+bool success
