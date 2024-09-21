@@ -1,0 +1,14 @@
+<launch>
+
+    <arg name="project" default="liloc"/>
+    
+    <!-- Parameters -->
+    <rosparam file="$(find liloc)/config/m2dgr.yaml" command="load" />
+
+    <!--- LOAM -->
+    <include file="$(find liloc)/launch/include/module_loam.launch" />
+
+    <!--- Run Rviz-->
+    <include file="$(find liloc)/launch/include/module_rviz.launch" />
+
+</launch>

@@ -5,14 +5,15 @@
     <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
     <a href=https://www.bilibili.com/video/BV1uatkeFEWL/?vd_source=7936e3be9727382a31661ae25224c8ad>🎬Bilibili</a>
     <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-    <a href="https://github.com/YixFeng/Block-Map-Based-Localization/blob/main/README.md#Installation">🛠️Installation</a>
+    <a href="https://github.com/Yixin-F/LiLoc/blob/main/README.md#Installation">🛠️Installation</a>
     <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
     <a href=https://arxiv.org/abs/2409.10172>📑Paper</a>
   <br />
   <br />
 </div>
 
-![BMLoc_cover](doc/liloc.png)
+![LiLoc_cover](doc/liloc.png)
+
 
 In this work, we propose a versatile graph-based lifelong localization framework, <strong>LiLoc</strong> , which enhances its timeliness by maintaining a single central session while improves the accuracy through multi-modal factors between the central and subsidiary sessions. The main contributions are as follows:
 
@@ -36,13 +37,15 @@ In this work, we propose a versatile graph-based lifelong localization framework
 
 #### 1.2 Other Packages
 - [ndt_omp](https://github.com/koide3/ndt_omp)
+- [livox_ros_driver](https://github.com/Livox-SDK/livox_ros_driver)
 - [better_fastlio2](https://github.com/Yixin-F/better_fastlio2) (Refer to the module of "pose initialization" in this open-source repositories, the new reconstructed code is comming soon.)
 
 ### 2. Build
 ```bash
 cd <your workspace>/src
 git clone https://github.com/koide3/ndt_omp
-git clone https://github.com/YixFeng/Block-Map-Based-Localization
+git clone https://github.com/Livox-SDK/livox_ros_driver
+git clone https://github.com/Yixin-F/LiLoc
 
 cd ..
 catkin_make
@@ -50,47 +53,57 @@ source devel/setup.bash
 ```
 
 ## Run
-We provide some [Block Maps](https://drive.google.com/file/d/1Z2K56jTkMOouZhM4c9JhPvqyDxGFiXSY/view?usp=drive_link) (Google Drive) to make your tests easy. 
+###  <strong>Remark 1:</strong> How to set your localization mode ?
+Since LiLoc is a graph-based localization method with a mode-switching mechanism, you need to provide the directory where your prior maps are stored and confirm your localization mode.  Edit the parameter `mode` in `config/*.yaml` files to change the localization mode. If your set `lio`, LiLoc can be truned in to incremantal localization mode and be directly used as a SLAM algorithm. You should edit the parameter `savePCDDirectory` in `config/*.yaml` files to confirm where the results are stored. Otherwise, if you set "relo", LiLoc is truned in to relocalization mode. So, you should edit the parameter `savePCDDirectory` in `config/*.yaml` files to confirm where the prior knowledge are loaded and the parameter `saveSessionDirectory` in `config/*.yaml` files to confirm where the upated central session maps are stored.
 
-- **M2DGR street_01**
-  
-![m2dgr_street_01](figs/m2dgr_street_01.png)
+###  <strong>Remark 2:</strong> How to save your results ?
+```bash
+rosservice call /liloc/save_map 0.2 1 1  # save results of the current session
+```
+or
+```bash
+rosservice call /liloc/save_session 0.2  # save results of the updated central session
+```
 
-- **M2DGR street_02**
-
-![m2dgr_street_02](figs/m2dgr_street_02.png)
-
-### 1. NCLT
+### 1. NCLT dataset
 Download NCLT from [https://robots.engin.umich.edu/nclt/](https://robots.engin.umich.edu/nclt/)
 ```bash
 roslaunch block_localization run_nclt.launch
 ```
 
-### 2. M2DGR
+### 2. M2DGR dataset
 Download M2DGR from [https://github.com/SJTU-ViSYS/M2DGR](https://github.com/SJTU-ViSYS/M2DGR)
 ```bash
 roslaunch block_localization run_m2dgr.launch
 ```
-*Remarks:*
-Since BM-Loc is a map-based localization method, you need to provide the directory where maps are stored. Edit the parameter `globalmap_dir` in `config/*.yaml` files. 
+
+### 3. Our School dataset
+Download the School dataset from [Google Driver](https://drive.google.com/drive/folders/14u6axUkISU5j9CxxUYEoU7Le1qneiOvA?usp=sharing)
+```bash
+roslaunch block_localization run_lio_sam_mid360.launch
+```
+
+### 4. Our Factor dataset
+Download the School dataset from [Google Driver](https://drive.google.com/drive/folders/13e476AmgzPgjNNQ71qwy_0sErJg4607J?usp=sharing)
+```bash
+roslaunch block_localization run_lio_sam_default.launch
+```
+
 
 
 ## Citation
-If you use any of this code, please cite our [paper](https://arxiv.org/pdf/2404.18192).
+If you use any of this code, please cite our [paper](https://arxiv.org/abs/2409.10172).
 
 ```bibtex
-@article{feng2024block,
-  title={Block-Map-Based Localization in Large-Scale Environment},
-  author={Feng, Yixiao and Jiang, Zhou and Shi, Yongliang and Feng, Yunlong and Chen, Xiangyu and Zhao, Hao and Zhou, Guyue},
-  journal={arXiv preprint arXiv:2404.18192},
+@article{fang2024liloc,
+  title={LiLoc: Lifelong Localization using Adaptive Submap Joining and Egocentric Factor Graph},
+  author={Fang, Yixin and Li, Yanyan and Qian, Kun and Tombari, Federico and Wang, Yue and Lee, Gim Hee},
+  journal={arXiv preprint arXiv:2409.10172},
   year={2024}
 }
 ```
 
 ## Acknowledgements
-Thanks for the open-source projects [hdl_localization](https://github.com/koide3/hdl_localization), [hdl_global_localization](https://github.com/koide3/hdl_localization) and [LIO-SAM](https://github.com/TixiaoShan/LIO-SAM).
-=======
-### The paper, titled "LiLoc: Lifelong Localization using Adaptive Submap Joining and Egocentric Factor Graph" is now publicly available on [Arxiv](https://arxiv.org/abs/2409.10172).
+Thanks for the open-source projects [LIO-SAM](https://github.com/TixiaoShan/LIO-SAM), [liorf](https://github.com/YJZLuckyBoy/liorf) and [Block-Map-Based-Localization](https://github.com/YixFeng/Block-Map-Based-Localization).
 
-### The reconstructed code is comming soon ...
->>>>>>> d950221b21a548fc472488a790e3f83315e4bb55
+
