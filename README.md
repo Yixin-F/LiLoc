@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <div align="center">
     <h1>LiLoc</h1>
     <br />
