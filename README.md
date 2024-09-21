@@ -65,7 +65,6 @@ Since our code of "pose initailization" is under reconstrucion, you can directly
 ```bash
 rosservice call /liloc/save_map 0.2 1 1  # save results of the current session
 ```
-or
 ```bash
 rosservice call /liloc/save_session 0.2  # save results of the updated central session
 ```
