@@ -12,7 +12,7 @@
   <br />
 </div>
 
-![LiLoc_cover](doc/liloc.png)
+<img src="doc/liloc.png" alt="LiLoc_cover" width="800">
 
 
 In this work, we propose a versatile graph-based lifelong localization framework, <strong>LiLoc</strong> , which enhances its timeliness by maintaining a single central session while improves the accuracy through multi-modal factors between the central and subsidiary sessions. The main contributions are as follows:
@@ -27,13 +27,15 @@ In this work, we propose a versatile graph-based lifelong localization framework
 ## Installation
 ### 1. Prerequisites
 #### 1.1 System and third-party packages
-- Ubuntu $\geq$ 18.04 (tested on Ubuntu 20.04)
+- Ubuntu $\geq$ 18.04 (tested on Noetic)
 
 - PCL $\geq$ 1.8 (tested on PCL 1.10)
 
+- Eigen >= 3.3.4 (default for Ubuntu 20.04)
+
 - OpenCV $\geq$ 4.0 (tested on OpenCV 4.2)
 
-- GTSAM $\geq$ 4.0.0 (tested on GTSAM 4.0.2)
+- GTSAM $\geq$ 4.0.3 (tested on GTSAM 4.2(a))
 
 #### 1.2 Other Packages
 - [ndt_omp](https://github.com/koide3/ndt_omp)
