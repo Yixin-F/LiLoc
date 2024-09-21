@@ -88,7 +88,7 @@ Download the School dataset from [Google Driver](https://drive.google.com/drive/
 roslaunch block_localization run_lio_sam_mid360.launch
 ```
 
-### 4. Our Factor dataset
+### 4. Our Factory dataset
 Download the School dataset from [Google Driver](https://drive.google.com/drive/folders/13e476AmgzPgjNNQ71qwy_0sErJg4607J?usp=sharing)
 ```bash
 roslaunch block_localization run_lio_sam_default.launch
