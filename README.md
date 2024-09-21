@@ -55,10 +55,13 @@ source devel/setup.bash
 ```
 
 ## Run
-###  <strong>Remark 1:</strong> How to set your localization mode ?
+####  <strong>Remark 1:</strong> How to set your localization mode ?
 Since LiLoc is a graph-based localization method with a mode-switching mechanism, you need to provide the directory where your prior maps are stored and confirm your localization mode.  Edit the parameter `mode` in `config/*.yaml` files to change the localization mode. If your set `lio`, LiLoc can be truned in to incremantal localization mode and be directly used as a SLAM algorithm. You should edit the parameter `savePCDDirectory` in `config/*.yaml` files to confirm where the results are stored. Otherwise, if you set "relo", LiLoc is truned in to relocalization mode. So, you should edit the parameter `savePCDDirectory` in `config/*.yaml` files to confirm where the prior knowledge are loaded and the parameter `saveSessionDirectory` in `config/*.yaml` files to confirm where the upated central session maps are stored.
 
-###  <strong>Remark 2:</strong> How to save your results ?
+####  <strong>Remark 2:</strong> How to set the initial pose ?
+Since our code of "pose initailization" is under reconstrucion, you can directly use the "2D pose estimation" or refer to our previous repository named [better_fastlio2](https://github.com/Yixin-F/better_fastlio2) to set the initial pose. The reconstructed code will be publicly aviliable as soon as possible.
+
+####  <strong>Remark 3:</strong> How to save your results ?
 ```bash
 rosservice call /liloc/save_map 0.2 1 1  # save results of the current session
 ```
@@ -66,8 +69,7 @@ or
 ```bash
 rosservice call /liloc/save_session 0.2  # save results of the updated central session
 ```
-###  <strong>Remark 3:</strong> How to set initial pose ?
-Since our code of "pose initailization" is under reconstrucion, you can directly use the "2D pose estimation" or refer to our previous repository named [better_fastlio2](https://github.com/Yixin-F/better_fastlio2) to set the initial pose. The reconstructed code will be publicly aviliable as soon as possible.
+
 
 ### 1. NCLT dataset
 Download NCLT from [https://robots.engin.umich.edu/nclt/](https://robots.engin.umich.edu/nclt/)
