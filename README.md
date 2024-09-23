@@ -1,7 +1,7 @@
 <div align="center">
     <h1>LiLoc</h1>
     <br />
-    <a href=[https://www.youtube.com/watch?v=txBE5ZRduEw](https://youtu.be/Kc2azOG8TSU)>🎬Youtube</a>
+    <a href=https://www.youtube.com/watch?v=txBE5ZRduEw>🎬Youtube</a>
     <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
     <a href=https://www.bilibili.com/video/BV1uatkeFEWL/?vd_source=7936e3be9727382a31661ae25224c8ad>🎬Bilibili</a>
     <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
