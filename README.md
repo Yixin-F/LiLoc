@@ -12,7 +12,7 @@
   <br />
 </div>
 
-<img src="doc/liloc.png" alt="LiLoc_cover" width="800">
+<img src="doc/liloc.jpg" alt="LiLoc_cover" width="800">
 
 
 In this work, we propose a versatile graph-based lifelong localization framework, <strong>LiLoc</strong> , which enhances its timeliness by maintaining a single central session while improves the accuracy through multi-modal factors between the central and subsidiary sessions. The main contributions are as follows:
