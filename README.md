@@ -15,7 +15,7 @@
 <img src="doc/liloc.jpg" alt="LiLoc_cover" width="800">
 
 
-In this work, we propose a versatile graph-based lifelong localization framework, <strong>LiLoc</strong> , which enhances its timeliness by maintaining a single central session while improves the accuracy through multi-modal factors between the central and subsidiary sessions. The main contributions are as follows:
+This repository contains the source code for our ICRA2025 paper. In this work, we propose a versatile graph-based lifelong localization framework, <strong>LiLoc</strong> , which enhances its timeliness by maintaining a single central session while improves the accuracy through multi-modal factors between the central and subsidiary sessions. The main contributions are as follows:
 
 - A graph-based framework for long-term localization featuring a flexible mode-switching mechanism, to achieve accurate multi-session localization.
 - An adaptive submap joining strategy to dynamically manage (i.e., generate, select and update) prior submaps, reducing system memory consumption while ensuring the timeliness of prior knowledge.
