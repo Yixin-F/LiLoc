@@ -415,8 +415,13 @@ public:
         timeScanEnd = timeScanCur + laserCloudIn->points.back().time;
 
         if (laserCloudIn->is_dense == false) {
-            ROS_ERROR("Point cloud is not in dense format, please remove NaN points first!");
-            ros::shutdown();
+            // ROS_ERROR("Point cloud is not in dense format, please remove NaN points first!");
+            // ros::shutdown();
+
+            pcl::PointCloud<PointXYZIRT>::Ptr tmpCloud(new pcl::PointCloud<PointXYZIRT>);
+            std::vector<int> indices;
+            pcl::removeNaNFromPointCloud(*laserCloudIn, *tmpCloud, indices);
+            laserCloudIn = tmpCloud;
         }
 
         return true;

@@ -1,0 +1,70 @@
+# Start from a ROS ${ROS_DISTRO} base image.
+ARG ROS_DISTRO=noetic
+FROM ros:${ROS_DISTRO}
+ENV DISABLE_ROS1_EOL_WARNINGS=1
+
+# --- Install common build tools and necessary dependencies ---
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+    keyboard-configuration \
+    && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    libpcl-dev \
+    libeigen3-dev \
+    libopencv-dev \
+    pcl-tools \
+    wget \
+    curl \
+    unzip \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# --- Install ROS Dependencies ---
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-${ROS_DISTRO}-rviz \
+    ros-${ROS_DISTRO}-pcl-ros \
+    ros-${ROS_DISTRO}-cv-bridge \
+    ros-${ROS_DISTRO}-gtsam \
+    ros-${ROS_DISTRO}-rqt-graph \
+    python3-catkin-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+# --- Install Livox SDK and ROS Driver ---
+WORKDIR /root
+# Livox SDK
+RUN git clone https://github.com/Livox-SDK/Livox-SDK.git && \
+    cd Livox-SDK && \
+    cd build && cmake .. && \
+    make && \
+    make install
+# Livox ROS Driver
+RUN git clone https://github.com/Livox-SDK/livox_ros_driver.git ws_livox/src && \
+    cd ws_livox && \
+    . /opt/ros/${ROS_DISTRO}/setup.sh && \
+    catkin_make
+
+# --- Create a catkin workspace ---
+ENV CATKIN_WS=/root/catkin_ws
+WORKDIR ${CATKIN_WS}/src
+
+# Copy in LiLoc source code
+COPY . ./liloc/
+
+# Clone dependencies
+RUN git clone https://github.com/koide3/ndt_omp.git
+
+# Build the ROS workspace
+WORKDIR ${CATKIN_WS}
+RUN /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
+    source ~/ws_livox/devel/setup.bash && \
+    catkin_make"
+
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc && \
+    echo "source ~/ws_livox/devel/setup.bash" >> ~/.bashrc && \
+    echo "if [ -f ~/catkin_ws/devel/setup.bash ]; then" >> ~/.bashrc && \
+    echo "  source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc && \
+    echo "fi" >> ~/.bashrc
+
+RUN mkdir -p /tmp/runtime-root

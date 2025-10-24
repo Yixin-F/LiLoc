@@ -1,0 +1,20 @@
+services:
+  liloc:
+    build:
+      context: ..
+      dockerfile: docker/dockerfile
+    image: liloc
+    container_name: liloc
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix # Needed to display RViz within the container
+      - ../:/root/catkin_ws/src/liloc/
+      - ${HOME}/data_sets:/root/catkin_ws/data_sets
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+      DISPLAY: "${DISPLAY}"
+    network_mode: host
+    stdin_open: true
+    tty: true
+    runtime: nvidia
+    command: ["bash"]
